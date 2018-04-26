@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerShipBehaviour : MonoBehaviour {
+public class PlayerShip : MonoBehaviour {
 
     // Use this for initialization
     float _heading;
@@ -26,7 +26,8 @@ public class PlayerShipBehaviour : MonoBehaviour {
         }
 
         _armour = 10;
-        Armour.text = "Armour " + _armour.ToString();
+        if (Armour != null)
+            Armour.text = "Armour " + _armour.ToString();
     }
 	
 	void FixedUpdate() {
@@ -42,17 +43,20 @@ public class PlayerShipBehaviour : MonoBehaviour {
         _rigidbody.AddRelativeForce(Vector3.up * speed);
         transform.eulerAngles = new Vector3(0, 0, RadianToDegree(-_heading));
 
-        Speed.text = "Speed " + Math.Round(_rigidbody.velocity.magnitude * 10, 0);
-        Heading.text = "Heading " + Math.Round(360 - transform.eulerAngles.z, 0);
+        if (Speed != null)
+            Speed.text = "Speed " + Math.Round(_rigidbody.velocity.magnitude * 10, 0);
+
+        if (Heading != null)
+            Heading.text = "Heading " + Math.Round(360 - transform.eulerAngles.z, 0);
         
     }
 
-    private double DegreeToRadian(double angle)
+    public static float DegreeToRadian(float angle)
     {
-        return Math.PI * angle / 180.0;
+        return (float)(Math.PI * angle / 180.0);
     }
 
-    private float RadianToDegree(float angle)
+    public static float RadianToDegree(float angle)
     {
         return (float)(angle * (180.0 / Math.PI));
     }
@@ -61,16 +65,20 @@ public class PlayerShipBehaviour : MonoBehaviour {
     {
         foreach (ContactPoint contact in collision.contacts)
         {
-            if (contact.otherCollider.gameObject.name.StartsWith("Bullet"))
+            if (contact.otherCollider.gameObject.name.StartsWith("Shot") || contact.otherCollider.gameObject.name.StartsWith("Missile"))
             {
-                _armour--;
+                var rigidbody = contact.otherCollider.GetComponent<Rigidbody>();
+                var b = rigidbody.velocity.magnitude;
+
+                _armour -= rigidbody.velocity.magnitude / 8.5f;
 
                 if (_armour < 0)
                 {
                     Destroy(contact.thisCollider.gameObject);
                 }
 
-                Armour.text = "Armour " + _armour.ToString();
+                if (Armour != null)
+                    Armour.text = "Armour " + _armour.ToString();
             }
         }
     }
