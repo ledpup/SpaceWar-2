@@ -300,7 +300,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4152761305496664, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 1.09
+      value: 1.21
       objectReference: {fileID: 0}
     - target: {fileID: 4152761305496664, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
       propertyPath: m_LocalPosition.z
@@ -330,8 +330,15 @@ Prefab:
       propertyPath: m_Name
       value: Bullet Emitter
       objectReference: {fileID: 0}
+    - target: {fileID: 135683545997380128, guid: d2104278cfd92a547a384df6736bcc95,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 33120053678754980, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
+    - {fileID: 54490319951429284, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
+    - {fileID: 135683545997380128, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
   m_IsPrefabParent: 0
 --- !u!1 &795076495 stripped
@@ -344,6 +351,13 @@ Transform:
   m_PrefabParentObject: {fileID: 4152761305496664, guid: d2104278cfd92a547a384df6736bcc95,
     type: 2}
   m_PrefabInternal: {fileID: 795076494}
+--- !u!33 &795076500
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 795076495}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1128817419
 GameObject:
   m_ObjectHideFlags: 0
@@ -420,9 +434,9 @@ GameObject:
   - component: {fileID: 1338392110}
   - component: {fileID: 1338392109}
   - component: {fileID: 1338392108}
-  - component: {fileID: 1338392107}
   - component: {fileID: 1338392112}
   - component: {fileID: 1338392113}
+  - component: {fileID: 1338392107}
   m_Layer: 0
   m_Name: Ship
   m_TagString: Untagged
@@ -441,7 +455,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08f3b79cc55316944939f184136ca2f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigidbody: {fileID: 0}
   Speed: {fileID: 1681403175}
   Heading: {fileID: 324151436}
 --- !u!23 &1338392108
@@ -538,9 +551,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 916539393d309be47a0ea662c656833a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Bullet_Emitter: {fileID: 795076495}
+  BulletEmitter: {fileID: 795076495}
   Bullet: {fileID: 1371502934080192, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
-  Bullet_Forward_Force: 50
+  BulletForce: 500
+  FiringRate: 0.5
 --- !u!1 &1681403173
 GameObject:
   m_ObjectHideFlags: 0
@@ -564,7 +578,7 @@ RectTransform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1681403173}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
