@@ -14,14 +14,5 @@ public class CubeBehaviour : MonoBehaviour {
 		
 	}
 
-    void OnCollisionEnter(Collision collision)
-    {
-        foreach (ContactPoint contact in collision.contacts)
-        {
-           if (contact.otherCollider.gameObject.name.StartsWith("Bullet"))
-            {
-                Destroy(contact.otherCollider.gameObject);
-            }
-        }
-    }
+    
 }

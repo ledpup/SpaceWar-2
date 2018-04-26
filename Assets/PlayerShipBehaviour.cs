@@ -28,7 +28,7 @@ public class PlayerShipBehaviour : MonoBehaviour {
         _rigidbody.AddRelativeForce(Vector3.up * speed);
         transform.eulerAngles = new Vector3(0, 0, RadianToDegree(-heading));
 
-        Speed.text = "Speed " + Math.Round(_rigidbody.velocity.magnitude, 1);
+        Speed.text = "Speed " + Math.Round(_rigidbody.velocity.magnitude * 10, 0);
         Heading.text = "Heading " + Math.Round(360 - transform.eulerAngles.z, 0);
     }
 
