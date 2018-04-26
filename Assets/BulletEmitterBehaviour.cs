@@ -19,7 +19,7 @@ public class BulletEmitterBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetButtonDown("Fire1") && Time.time > nextFire)
+        if (Input.GetButtonDown(name + "Fire1") && Time.time > nextFire)
         {
             nextFire = Time.time + FiringRate;
 

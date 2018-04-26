@@ -7,29 +7,44 @@ using UnityEngine.UI;
 public class PlayerShipBehaviour : MonoBehaviour {
 
     // Use this for initialization
-    float heading;
+    float _heading;
+    float _armour;
     Rigidbody _rigidbody;
     public Text Speed;
     public Text Heading;
+    public Text Armour;
     void Start () {
         _rigidbody = GetComponent<Rigidbody>();
+
+        if (name == "Player1")
+        {
+            GetComponent<Renderer>().material.color = Color.green;
+        }
+        else
+        {
+            GetComponent<Renderer>().material.color = Color.red;
+        }
+
+        _armour = 10;
+        Armour.text = "Armour " + _armour.ToString();
     }
 	
 	void FixedUpdate() {
-        var horizontal = Input.GetAxis("Horizontal");
-        var vertical = Input.GetAxis("Vertical");
+        var horizontal = Input.GetAxis(name + "Horizontal");
+        var vertical = Input.GetAxis(name + "Vertical");
 
         var speed = (vertical > 0 ? vertical : vertical * .6f) * 20f;
 
         var sign = speed >= 0 ? 1 : -1;
 
-        heading += sign * (horizontal * 5) * Time.deltaTime;
+        _heading += sign * (horizontal * 5) * Time.deltaTime;
 
         _rigidbody.AddRelativeForce(Vector3.up * speed);
-        transform.eulerAngles = new Vector3(0, 0, RadianToDegree(-heading));
+        transform.eulerAngles = new Vector3(0, 0, RadianToDegree(-_heading));
 
         Speed.text = "Speed " + Math.Round(_rigidbody.velocity.magnitude * 10, 0);
         Heading.text = "Heading " + Math.Round(360 - transform.eulerAngles.z, 0);
+        
     }
 
     private double DegreeToRadian(double angle)
@@ -40,5 +55,23 @@ public class PlayerShipBehaviour : MonoBehaviour {
     private float RadianToDegree(float angle)
     {
         return (float)(angle * (180.0 / Math.PI));
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        foreach (ContactPoint contact in collision.contacts)
+        {
+            if (contact.otherCollider.gameObject.name.StartsWith("Bullet"))
+            {
+                _armour--;
+
+                if (_armour < 0)
+                {
+                    Destroy(contact.thisCollider.gameObject);
+                }
+
+                Armour.text = "Armour " + _armour.ToString();
+            }
+        }
     }
 }
