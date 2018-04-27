@@ -145,7 +145,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 8
   m_CollisionDetection: 0
 --- !u!23 &9031428
 MeshRenderer:
@@ -266,6 +266,10 @@ Prefab:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4152761305496664, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
+      propertyPath: m_LocalScale.y
+      value: 0.2
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 33120053678754980, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
     - {fileID: 54490319951429284, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
@@ -371,7 +375,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 8
   m_CollisionDetection: 0
 --- !u!1 &322858842
 GameObject:
@@ -405,7 +409,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 8
   m_CollisionDetection: 0
 --- !u!23 &322858844
 MeshRenderer:
@@ -575,8 +579,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd80df870f8d7944597b838340f23d19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GuidedMissile: {fileID: 1210607065665294, guid: 88f51ccd0ea19ec45a020ee431937154,
-    type: 2}
+  Missile: {fileID: 1210607065665294, guid: 88f51ccd0ea19ec45a020ee431937154, type: 2}
   FiringRate: 0.5
 --- !u!1 &676360697
 GameObject:
@@ -640,7 +643,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 8
   m_CollisionDetection: 0
 --- !u!23 &676360701
 MeshRenderer:
@@ -759,6 +762,14 @@ Prefab:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4152761305496664, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
+      propertyPath: m_LocalScale.y
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4152761305496664, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 0.25
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 33120053678754980, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
     - {fileID: 54490319951429284, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
@@ -796,7 +807,7 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 795076495}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &860046800
 Prefab:
   m_ObjectHideFlags: 0
@@ -806,7 +817,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4152761305496664, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0.67
+      value: 0.61
       objectReference: {fileID: 0}
     - target: {fileID: 4152761305496664, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
       propertyPath: m_LocalPosition.y
@@ -838,7 +849,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1371502934080192, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
       propertyPath: m_Name
-      value: GuildedMissileLauncher
+      value: Missile Launcher
       objectReference: {fileID: 0}
     - target: {fileID: 135683545997380128, guid: d2104278cfd92a547a384df6736bcc95,
         type: 2}
@@ -1111,7 +1122,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 8
   m_CollisionDetection: 0
 --- !u!1 &1560728219 stripped
 GameObject:
@@ -1124,7 +1135,7 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1560728219}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!114 &1560728221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1250,7 +1261,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 8
   m_CollisionDetection: 0
 --- !u!23 &1691870392
 MeshRenderer:
@@ -1443,7 +1454,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 8
   m_CollisionDetection: 0
 --- !u!23 &1977395633
 MeshRenderer:

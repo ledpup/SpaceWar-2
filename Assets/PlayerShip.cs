@@ -15,6 +15,7 @@ public class PlayerShip : MonoBehaviour {
     public Text Armour;
     void Start () {
         _rigidbody = GetComponent<Rigidbody>();
+        _heading = -DegreeToRadian(transform.eulerAngles.z);
 
         if (name == "Player1")
         {
@@ -40,8 +41,8 @@ public class PlayerShip : MonoBehaviour {
 
         _heading += sign * (horizontal * 5) * Time.deltaTime;
 
-        _rigidbody.AddRelativeForce(Vector3.up * speed);
         transform.eulerAngles = new Vector3(0, 0, RadianToDegree(-_heading));
+        _rigidbody.AddRelativeForce(Vector3.up * speed);
 
         if (Speed != null)
             Speed.text = "Speed " + Math.Round(_rigidbody.velocity.magnitude * 10, 0);
