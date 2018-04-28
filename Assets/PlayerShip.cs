@@ -71,15 +71,23 @@ public class PlayerShip : MonoBehaviour {
                 var rigidbody = contact.otherCollider.GetComponent<Rigidbody>();
                 var b = rigidbody.velocity.magnitude;
 
-                _armour -= rigidbody.velocity.magnitude / 8.5f;
-
-                if (_armour < 0)
+                var collider = collision.contacts[0].thisCollider;
+                if (collider.name.StartsWith("Missile Launcher") || collider.name.StartsWith("Cannon"))
                 {
-                    Destroy(contact.thisCollider.gameObject);
+                    Destroy(collider.gameObject);
                 }
+                else
+                {
+                    _armour -= rigidbody.velocity.magnitude / 8.5f;
 
-                if (Armour != null)
-                    Armour.text = "Armour " + _armour.ToString();
+                    if (_armour < 0)
+                    {
+                        Destroy(contact.thisCollider.gameObject);
+                    }
+
+                    if (Armour != null)
+                        Armour.text = "Armour " + _armour.ToString();
+                }
             }
         }
     }

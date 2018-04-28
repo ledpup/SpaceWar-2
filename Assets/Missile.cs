@@ -27,6 +27,11 @@ public class Missile : MonoBehaviour
 
     void FixedUpdate()
     {
+        var collider = GetComponent<CapsuleCollider>();
+        if (_created + .5F < Time.time && !collider.enabled)
+        {
+            collider.enabled = true;
+        }
         switch (_missleType)
         {
             case MissleType.Guided:
@@ -36,7 +41,7 @@ public class Missile : MonoBehaviour
                 break;
             case MissleType.Homing:
 
-                if (_created + .5f < Time.time && _target != null)
+                if (_created + .75f < Time.time && _target != null)
                 {
                     var eulerAngles = transform.eulerAngles;
                     var position = transform.position;
@@ -45,14 +50,14 @@ public class Missile : MonoBehaviour
                     var rightHeading = _heading + .1f;
 
                     transform.eulerAngles = new Vector3(0, 0, PlayerShip.RadianToDegree(-leftHeading));
-                    transform.Translate(Vector3.up * .5f);
+                    transform.Translate(Vector3.up * .25f);
                     var leftDistance = Vector3.Distance(_target.transform.position, transform.position);
 
                     transform.eulerAngles = eulerAngles;
                     transform.position = position;
 
                     transform.eulerAngles = new Vector3(0, 0, PlayerShip.RadianToDegree(-rightHeading));
-                    transform.Translate(Vector3.up * .5f);
+                    transform.Translate(Vector3.up * .25f);
 
                     var rightDistance = Vector3.Distance(_target.transform.position, transform.position);
 
@@ -69,7 +74,7 @@ public class Missile : MonoBehaviour
         }
 
         transform.eulerAngles = new Vector3(0, 0, PlayerShip.RadianToDegree(-_heading));
-        _rigidbody.AddRelativeForce(Vector3.up * 30);
+        _rigidbody.AddRelativeForce(Vector3.up * 40);
     }
 
     void SetMissileType(MissleType missleType)
