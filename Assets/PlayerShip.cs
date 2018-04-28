@@ -74,6 +74,7 @@ public class PlayerShip : MonoBehaviour {
                 var collider = collision.contacts[0].thisCollider;
                 if (collider.name.StartsWith("Missile Launcher") || collider.name.StartsWith("Cannon"))
                 {
+                    // Change this later to damage child components rather than destroying them outright
                     Destroy(collider.gameObject);
                 }
                 else

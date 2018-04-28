@@ -42,15 +42,4 @@ public class MissileLauncher : MonoBehaviour {
             Destroy(missile, fire3 ? 10f : 5f);
         }
     }
-
-    void OnCollisionEnter(Collision collision)
-    {
-        foreach (ContactPoint contact in collision.contacts)
-        {
-            if (contact.otherCollider.gameObject.name.StartsWith("Shot") || contact.otherCollider.gameObject.name.StartsWith("Missile"))
-            {
-                Destroy(contact.thisCollider.gameObject);
-            }
-        }
-    }
 }
