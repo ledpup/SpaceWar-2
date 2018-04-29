@@ -13,6 +13,8 @@ public class PlayerShip : MonoBehaviour {
     public Text Speed;
     public Text Heading;
     public Text Armour;
+    float _lockedRotationUntil;
+
     void Start () {
         _rigidbody = GetComponent<Rigidbody>();
         _heading = -DegreeToRadian(transform.eulerAngles.z);
@@ -21,7 +23,7 @@ public class PlayerShip : MonoBehaviour {
         {
             GetComponent<Renderer>().material.color = Color.green;
         }
-        else
+        else if (name == "Player2")
         {
             GetComponent<Renderer>().material.color = Color.red;
         }
@@ -29,6 +31,8 @@ public class PlayerShip : MonoBehaviour {
         _armour = 10;
         if (Armour != null)
             Armour.text = "Armour " + _armour.ToString();
+
+        _lockedRotationUntil = Time.time;
     }
 	
 	void FixedUpdate() {
@@ -39,7 +43,8 @@ public class PlayerShip : MonoBehaviour {
 
         var sign = speed >= 0 ? 1 : -1;
 
-        _heading += sign * (horizontal * 5) * Time.deltaTime;
+        if (_lockedRotationUntil < Time.time)
+            _heading += sign * (horizontal * 5) * Time.deltaTime;
 
         transform.eulerAngles = new Vector3(0, 0, RadianToDegree(-_heading));
         _rigidbody.AddRelativeForce(Vector3.up * speed);
@@ -50,6 +55,11 @@ public class PlayerShip : MonoBehaviour {
         if (Heading != null)
             Heading.text = "Heading " + Math.Round(360 - transform.eulerAngles.z, 0);
         
+    }
+
+    void LockRotation(float duration)
+    {
+        _lockedRotationUntil = Time.time + duration;
     }
 
     public static float DegreeToRadian(float angle)

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,17 +13,25 @@ public enum MissleType
 }
 public class Missile : MonoBehaviour
 {
-
+    public GameObject TargetPoint;
     float _heading;
     Rigidbody _rigidbody;
     MissleType _missleType;
     GameObject _target;
     float _created;
 
+    GameObject _targetPoint;
+
     void Start () {
         _rigidbody = GetComponent<Rigidbody>();
         _heading = -PlayerShip.DegreeToRadian(transform.eulerAngles.z);
         _created = Time.time;
+
+        if (_missleType == MissleType.Smart)
+        {
+            _targetPoint = Instantiate(TargetPoint, transform.position, transform.rotation) as GameObject;
+            _targetPoint.GetComponent<Renderer>().material.color = Color.red;
+        }
     }
 
     void FixedUpdate()
@@ -32,6 +41,9 @@ public class Missile : MonoBehaviour
         {
             collider.enabled = true;
         }
+
+        var projectileSpeed = (5 / ((float)Math.Round(Time.time - _created, 2)) + 75);
+
         switch (_missleType)
         {
             case MissleType.Guided:
@@ -40,41 +52,76 @@ public class Missile : MonoBehaviour
 
                 break;
             case MissleType.Homing:
-
-                if (_created + .75f < Time.time && _target != null)
                 {
-                    var eulerAngles = transform.eulerAngles;
-                    var position = transform.position;
+                    if (_created + .75f < Time.time && _target != null)
+                    {
+                        float leftHeading, rightHeading, leftDistance, rightDistance;
 
-                    var leftHeading = _heading - .1f;
-                    var rightHeading = _heading + .1f;
+                        leftHeading = _heading - .2f;
+                        rightHeading = _heading + .2f;
 
-                    transform.eulerAngles = new Vector3(0, 0, PlayerShip.RadianToDegree(-leftHeading));
-                    transform.Translate(Vector3.up * .25f);
-                    var leftDistance = Vector3.Distance(_target.transform.position, transform.position);
+                        DetermineTurnDirection(leftHeading, rightHeading, out leftDistance, out rightDistance, _target.transform.position);
 
-                    transform.eulerAngles = eulerAngles;
-                    transform.position = position;
-
-                    transform.eulerAngles = new Vector3(0, 0, PlayerShip.RadianToDegree(-rightHeading));
-                    transform.Translate(Vector3.up * .25f);
-
-                    var rightDistance = Vector3.Distance(_target.transform.position, transform.position);
-
-                    transform.eulerAngles = eulerAngles;
-                    transform.position = position;
-
-                    if (leftDistance < rightDistance)
-                        _heading = leftHeading;
-                    else if (leftDistance > rightDistance)
-                        _heading = rightHeading;
-                    // else stay on current heading
+                        if (leftDistance < rightDistance)
+                            _heading = leftHeading;
+                        else if (leftDistance > rightDistance)
+                            _heading = rightHeading;
+                        // else stay on current heading
+                    }
+                    break;
                 }
-                break;
+            case MissleType.Smart:
+                {
+                    if (_created + .75f < Time.time && _target != null)
+                    {
+                        var targetRigidBody = _target.GetComponent<Rigidbody>();
+
+                        float distance = Vector3.Distance(transform.position, _target.transform.position);
+
+                        Vector3 targetPosition = Assets.PredictiveAiming.FirstOrderIntercept(transform.position, Vector3.zero, projectileSpeed, _target.transform.position, targetRigidBody.velocity);
+
+                        _targetPoint.transform.position = targetPosition;
+
+                        float leftHeading, rightHeading, leftDistance, rightDistance;
+
+                        leftHeading = _heading - .2f;
+                        rightHeading = _heading + .2f;
+
+                        DetermineTurnDirection(leftHeading, rightHeading, out leftDistance, out rightDistance, targetPosition);
+
+                        if (leftDistance < rightDistance)
+                            _heading = leftHeading;
+                        else if (leftDistance > rightDistance)
+                            _heading = rightHeading;
+                        // else stay on current heading
+                    }
+                    break;
+                }
         }
 
         transform.eulerAngles = new Vector3(0, 0, PlayerShip.RadianToDegree(-_heading));
-        _rigidbody.AddRelativeForce(Vector3.up * 40);
+        _rigidbody.AddRelativeForce(Vector3.up * projectileSpeed);
+    }
+
+    private void DetermineTurnDirection(float leftHeading, float rightHeading, out float leftDistance, out float rightDistance, Vector3 targetPosition)
+    {
+        var eulerAngles = transform.eulerAngles;
+        var position = transform.position;
+
+        transform.eulerAngles = new Vector3(0, 0, PlayerShip.RadianToDegree(-leftHeading));
+        transform.Translate(Vector3.up * .5f);
+        leftDistance = Vector3.Distance(targetPosition, transform.position);
+
+        transform.eulerAngles = eulerAngles;
+        transform.position = position;
+
+        transform.eulerAngles = new Vector3(0, 0, PlayerShip.RadianToDegree(-rightHeading));
+        transform.Translate(Vector3.up * .5f);
+
+        rightDistance = Vector3.Distance(targetPosition, transform.position);
+
+        transform.eulerAngles = eulerAngles;
+        transform.position = position;
     }
 
     void SetMissileType(MissleType missleType)
@@ -90,6 +137,7 @@ public class Missile : MonoBehaviour
             if (gameObject.name == target)
             {
                 _target = gameObject;
+                
             }
         }
     }
@@ -101,6 +149,8 @@ public class Missile : MonoBehaviour
             if (!contact.otherCollider.gameObject.name.Contains("wall"))
             {
                 Destroy(contact.thisCollider.gameObject);
+                if (_targetPoint != null)
+                    Destroy(_targetPoint);
             }
         }
     }

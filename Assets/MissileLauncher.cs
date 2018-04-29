@@ -24,16 +24,15 @@ public class MissileLauncher : MonoBehaviour {
         {
             _nextFire = Time.time + FiringRate;
 
+            transform.parent.gameObject.SendMessage("LockRotation", .5);
+
             var missile = Instantiate(Missile, transform.position, transform.rotation) as GameObject;
 
             missile.tag = parent.name;
-            missile.SendMessage("SetMissileType", fire2 ? MissleType.Guided : MissleType.Homing);
+            missile.SendMessage("SetMissileType", fire2 ? MissleType.Smart : MissleType.Homing);
 
-            if (fire3)
-            {
-                missile.SendMessage("SetTarget", "Player1");
-            }
-
+            missile.SendMessage("SetTarget", "Player1");
+            
             var bulletRigidBody = missile.GetComponent<Rigidbody>();
             var shipRigidBody = parent.GetComponent<Rigidbody>();
 
