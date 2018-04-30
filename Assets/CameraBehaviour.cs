@@ -80,6 +80,8 @@ public class CameraBehaviour : MonoBehaviour {
             transforms.Add(t1.transform);
         if (t2 != null)
             transforms.Add(t2.transform);
+        if (t3 != null)
+            transforms.Add(t3.transform);
 
         FixedCameraFollowSmooth(GetComponent<Camera>(), transforms);
     }
