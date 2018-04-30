@@ -17,9 +17,10 @@ public class Cannon : MonoBehaviour
         var parent = transform.parent;
         try
         {
-            _fireButtonValid = Input.GetButton(parent.name + "Fire1");
+            Input.GetButton(parent.name + "Fire1");
+            _fireButtonValid = true;
         }
-        catch
+        catch (Exception ex)
         {
             _fireButtonValid = false;
         }
