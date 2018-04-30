@@ -113,6 +113,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TargetPoint: {fileID: 1805090989893920, guid: 152e3c411a206bc4d90b89a25d6237d8,
     type: 2}
+  RotationRate: 100
 --- !u!136 &136168685461578192
 CapsuleCollider:
   m_ObjectHideFlags: 1

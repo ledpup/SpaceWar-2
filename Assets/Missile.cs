@@ -14,6 +14,8 @@ public enum MissleType
 public class Missile : MonoBehaviour
 {
     public GameObject TargetPoint;
+    public float RotationRate;
+
     float _heading;
     Rigidbody _rigidbody;
     MissleType _missleType;
@@ -50,23 +52,16 @@ public class Missile : MonoBehaviour
                 var horizontal = Input.GetAxis(tag + "Horizontal2");
                 _heading += (horizontal * 5) * Time.deltaTime;
 
+                transform.eulerAngles = new Vector3(0, 0, PlayerShip.RadianToDegree(-_heading));
+                
+
                 break;
             case MissleType.Homing:
                 {
                     if (_created + .75f < Time.time && _target != null)
                     {
-                        float leftHeading, rightHeading, leftDistance, rightDistance;
-
-                        leftHeading = _heading - .2f;
-                        rightHeading = _heading + .2f;
-
-                        DetermineTurnDirection(leftHeading, rightHeading, out leftDistance, out rightDistance, _target.transform.position);
-
-                        if (leftDistance < rightDistance)
-                            _heading = leftHeading;
-                        else if (leftDistance > rightDistance)
-                            _heading = rightHeading;
-                        // else stay on current heading
+                        transform.rotation = Assets.Targeting.RotateToTarget(_target.transform.position, transform.position);
+                        //transform.rotation = Quaternion.Slerp(transform.rotation, rotation, RotationRate);
                     }
                     break;
                 }
@@ -74,54 +69,20 @@ public class Missile : MonoBehaviour
                 {
                     if (_created + .75f < Time.time && _target != null)
                     {
+
                         var targetRigidBody = _target.GetComponent<Rigidbody>();
 
-                        float distance = Vector3.Distance(transform.position, _target.transform.position);
+                        var targetAimPoint = Assets.PredictiveAiming.FirstOrderIntercept(transform.position, Vector3.zero, projectileSpeed, _target.transform.position, targetRigidBody.velocity);
+                        _targetPoint.transform.position = targetAimPoint;
 
-                        Vector3 targetPosition = Assets.PredictiveAiming.FirstOrderIntercept(transform.position, Vector3.zero, projectileSpeed, _target.transform.position, targetRigidBody.velocity);
-
-                        _targetPoint.transform.position = targetPosition;
-
-                        float leftHeading, rightHeading, leftDistance, rightDistance;
-
-                        leftHeading = _heading - .2f;
-                        rightHeading = _heading + .2f;
-
-                        DetermineTurnDirection(leftHeading, rightHeading, out leftDistance, out rightDistance, targetPosition);
-
-                        if (leftDistance < rightDistance)
-                            _heading = leftHeading;
-                        else if (leftDistance > rightDistance)
-                            _heading = rightHeading;
-                        // else stay on current heading
+                        transform.rotation = Assets.Targeting.RotateToTarget(targetAimPoint, transform.position);
+                        //transform.rotation = Quaternion.Slerp(transform.rotation, rotation, RotationRate);
                     }
                     break;
                 }
         }
 
-        transform.eulerAngles = new Vector3(0, 0, PlayerShip.RadianToDegree(-_heading));
         _rigidbody.AddRelativeForce(Vector3.up * projectileSpeed);
-    }
-
-    private void DetermineTurnDirection(float leftHeading, float rightHeading, out float leftDistance, out float rightDistance, Vector3 targetPosition)
-    {
-        var eulerAngles = transform.eulerAngles;
-        var position = transform.position;
-
-        transform.eulerAngles = new Vector3(0, 0, PlayerShip.RadianToDegree(-leftHeading));
-        transform.Translate(Vector3.up * .5f);
-        leftDistance = Vector3.Distance(targetPosition, transform.position);
-
-        transform.eulerAngles = eulerAngles;
-        transform.position = position;
-
-        transform.eulerAngles = new Vector3(0, 0, PlayerShip.RadianToDegree(-rightHeading));
-        transform.Translate(Vector3.up * .5f);
-
-        rightDistance = Vector3.Distance(targetPosition, transform.position);
-
-        transform.eulerAngles = eulerAngles;
-        transform.position = position;
     }
 
     void SetMissileType(MissleType missleType)

@@ -38,7 +38,7 @@ public class MissileLauncher : MonoBehaviour {
 
             bulletRigidBody.velocity = shipRigidBody.velocity; // Base speed on the ship's velocity
 
-            Destroy(missile, fire3 ? 10f : 5f);
+            Destroy(missile, fire3 ? 10f : 10f);
         }
     }
 }

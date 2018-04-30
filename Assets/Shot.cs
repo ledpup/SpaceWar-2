@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class Shot : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
+	void Start ()
+    {
+        
+    }
 	
 	// Update is called once per frame
 	void Update () {
-		
+        //var mag = transform.GetComponent<Rigidbody>().velocity.magnitude;
 	}
 
     void OnCollisionEnter(Collision collision)
