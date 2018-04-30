@@ -44,7 +44,7 @@ public class PlayerShip : MonoBehaviour {
         var sign = speed >= 0 ? 1 : -1;
 
         if (_lockedRotationUntil < Time.time)
-            _heading += sign * (horizontal * 5) * Time.deltaTime;
+            _heading -= sign * (horizontal * 5) * Time.deltaTime;
 
         transform.eulerAngles = new Vector3(0, 0, RadianToDegree(-_heading));
         _rigidbody.AddRelativeForce(Vector3.up * speed);

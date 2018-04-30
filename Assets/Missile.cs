@@ -41,7 +41,7 @@ public class Missile : MonoBehaviour
     void FixedUpdate()
     {
         var collider = GetComponent<CapsuleCollider>();
-        if (_created + .5F < Time.time && !collider.enabled)
+        if (_created + .25F < Time.time && !collider.enabled)
         {
             collider.enabled = true;
         }

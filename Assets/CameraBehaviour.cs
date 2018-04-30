@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class CameraBehaviour : MonoBehaviour {
 
     double mapX, mapY = 100.0f;
     double minX, maxX, minY, maxY;
-    public GameObject t1, t2;
+    public GameObject t1, t2, t3;
 
 	// Use this for initialization
 	void Start () {
@@ -23,37 +24,63 @@ public class CameraBehaviour : MonoBehaviour {
 
     }
 
-    public void FixedCameraFollowSmooth(Camera cam, Transform t1, Transform t2)
+    public void FixedCameraFollowSmooth(Camera camera, List<Transform> transforms)
     {
-        // How many units should we keep from the players
-        float zoomFactor = 1.5f;
-        float followTimeDelta = 0.8f;
+        var zoomFactor = 1f;
+        var followTimeDelta = 0.01f;
 
-        // Midpoint we're after
-        Vector3 midpoint = (t1.position + t2.position) / 2f;
-
-        // Distance between objects
-        float distance = (t1.position - t2.position).magnitude;
-
-        // Move camera a certain distance
-        Vector3 cameraDestination = midpoint - cam.transform.forward * distance * zoomFactor;
-
-        // Adjust ortho size if we're using one of those
-        if (cam.orthographic)
+        Vector3 cameraDestination;
+        float distance = 0;
+        if (transforms.Count > 1)
         {
-            // The camera's forward vector is irrelevant, only this size will matter
-            cam.orthographicSize = distance;
+            var transformSum = Vector3.zero;
+            var distances = new List<float>();
+            Vector3 previousObjectPostion = Vector3.zero;
+            foreach (var transform in transforms)
+            {
+                transformSum += transform.position;
+                if (previousObjectPostion != Vector3.zero)
+                    distances.Add(Vector3.Distance(transform.position, previousObjectPostion));
+                previousObjectPostion = transform.position;
+            }
+
+            var midpoint = transformSum / transforms.Count;
+
+            distance = distances.Max();
+
+            cameraDestination = midpoint - camera.transform.forward * distance * zoomFactor;
         }
+        else
+            cameraDestination = transforms[0].position;
+
+        // Lock the maximum zoom
+        if (cameraDestination.z < 30f)
+            cameraDestination.z = 30f;
+
+
+        if (camera.orthographic)
+        {
+            camera.orthographicSize = distance;
+        }
+
         // You specified to use MoveTowards instead of Slerp
-        cam.transform.position = Vector3.Slerp(cam.transform.position, cameraDestination, followTimeDelta);
+        camera.transform.position = Vector3.Slerp(camera.transform.position, cameraDestination, followTimeDelta);
 
         // Snap when close enough to prevent annoying slerp behavior
-        if ((cameraDestination - cam.transform.position).magnitude <= 0.05f)
-            cam.transform.position = cameraDestination;
+        if ((cameraDestination - camera.transform.position).magnitude <= 0.05f)
+            camera.transform.position = cameraDestination;
     }
 
     // Update is called once per frame
-    void Update () {
-        FixedCameraFollowSmooth(GetComponent<Camera>(), t1.transform, t2.transform);
+    void FixedUpdate () {
+
+        var transforms = new List<Transform>();
+
+        if (t1 != null)
+            transforms.Add(t1.transform);
+        if (t2 != null)
+            transforms.Add(t2.transform);
+
+        FixedCameraFollowSmooth(GetComponent<Camera>(), transforms);
     }
 }
