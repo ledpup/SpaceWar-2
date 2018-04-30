@@ -44,7 +44,7 @@ public class Missile : MonoBehaviour
             collider.enabled = true;
         }
 
-        var projectileSpeed = (5 / ((float)Math.Round(Time.time - _created, 2)) + 75);
+        var projectileSpeed = (5 / ((float)Math.Round(Time.time - _created, 2)) + 50);
 
         switch (_missleType)
         {
