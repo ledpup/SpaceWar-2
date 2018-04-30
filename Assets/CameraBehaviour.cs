@@ -9,7 +9,6 @@ public class CameraBehaviour : MonoBehaviour {
     double minX, maxX, minY, maxY;
     public GameObject t1, t2, t3;
 
-	// Use this for initialization
 	void Start () {
         var vertExtent = GetComponent<Camera>().orthographicSize;
         var horzExtent = vertExtent * Screen.width / Screen.height;
@@ -19,12 +18,9 @@ public class CameraBehaviour : MonoBehaviour {
         maxX = mapX / 2.0 - horzExtent;
         minY = vertExtent - mapY / 2.0;
         maxY = mapY / 2.0 - vertExtent;
-
-
-
     }
 
-    public void FixedCameraFollowSmooth(Camera camera, List<Transform> transforms)
+    public void CameraFollowSmooth(Camera camera, List<Transform> transforms)
     {
         var zoomFactor = 1f;
         var followTimeDelta = 0.01f;
@@ -54,8 +50,8 @@ public class CameraBehaviour : MonoBehaviour {
             cameraDestination = transforms[0].position;
 
         // Lock the maximum zoom
-        if (cameraDestination.z < 30f)
-            cameraDestination.z = 30f;
+        if (cameraDestination.z < 25f)
+            cameraDestination.z = 25f;
 
 
         if (camera.orthographic)
@@ -63,7 +59,6 @@ public class CameraBehaviour : MonoBehaviour {
             camera.orthographicSize = distance;
         }
 
-        // You specified to use MoveTowards instead of Slerp
         camera.transform.position = Vector3.Slerp(camera.transform.position, cameraDestination, followTimeDelta);
 
         // Snap when close enough to prevent annoying slerp behavior
@@ -71,8 +66,7 @@ public class CameraBehaviour : MonoBehaviour {
             camera.transform.position = cameraDestination;
     }
 
-    // Update is called once per frame
-    void FixedUpdate () {
+    void Update () {
 
         var transforms = new List<Transform>();
 
@@ -83,6 +77,6 @@ public class CameraBehaviour : MonoBehaviour {
         if (t3 != null)
             transforms.Add(t3.transform);
 
-        FixedCameraFollowSmooth(GetComponent<Camera>(), transforms);
+        CameraFollowSmooth(GetComponent<Camera>(), transforms);
     }
 }
