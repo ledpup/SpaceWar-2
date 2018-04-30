@@ -30,18 +30,21 @@ public class AiTurret : MonoBehaviour
 
     void Update()
     {
-        var targetAimPoint = Assets.PredictiveAiming.FirstOrderIntercept(transform.position, Vector3.zero, _projectileSpeed, Target.transform.position, _targetRigidBody.velocity);
-        _targetPoint.transform.position = targetAimPoint;
-
-        var rotation = Assets.Targeting.RotateToTarget(targetAimPoint, transform.position);
-
-        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, RotationRate * Time.deltaTime);
-
-        var distanceToTarget = Vector3.Distance(Target.transform.position, transform.position);
-
-        if (distanceToTarget < 10)
+        if (Target != null)
         {
-            _cannon.FireCannon();
+            var targetAimPoint = Assets.PredictiveAiming.FirstOrderIntercept(transform.position, Vector3.zero, _projectileSpeed, Target.transform.position, _targetRigidBody.velocity);
+            _targetPoint.transform.position = targetAimPoint;
+
+            var rotation = Assets.Targeting.RotateToTarget(targetAimPoint, transform.position);
+
+            transform.rotation = Quaternion.Slerp(transform.rotation, rotation, RotationRate * Time.deltaTime);
+
+            var distanceToTarget = Vector3.Distance(Target.transform.position, transform.position);
+
+            if (distanceToTarget < 10)
+            {
+                _cannon.FireCannon();
+            }
         }
     }   
 }

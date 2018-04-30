@@ -29,6 +29,8 @@ public class Missile : MonoBehaviour
         _heading = -PlayerShip.DegreeToRadian(transform.eulerAngles.z);
         _created = Time.time;
 
+        RotationRate = .9f;
+
         if (_missleType == MissleType.Smart)
         {
             _targetPoint = Instantiate(TargetPoint, transform.position, transform.rotation) as GameObject;
@@ -60,8 +62,8 @@ public class Missile : MonoBehaviour
                 {
                     if (_created + .75f < Time.time && _target != null)
                     {
-                        transform.rotation = Assets.Targeting.RotateToTarget(_target.transform.position, transform.position);
-                        //transform.rotation = Quaternion.Slerp(transform.rotation, rotation, RotationRate);
+                        var rotation = Assets.Targeting.RotateToTarget(_target.transform.position, transform.position);
+                        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, RotationRate);
                     }
                     break;
                 }
@@ -75,8 +77,8 @@ public class Missile : MonoBehaviour
                         var targetAimPoint = Assets.PredictiveAiming.FirstOrderIntercept(transform.position, Vector3.zero, projectileSpeed, _target.transform.position, targetRigidBody.velocity);
                         _targetPoint.transform.position = targetAimPoint;
 
-                        transform.rotation = Assets.Targeting.RotateToTarget(targetAimPoint, transform.position);
-                        //transform.rotation = Quaternion.Slerp(transform.rotation, rotation, RotationRate);
+                        var rotation = Assets.Targeting.RotateToTarget(targetAimPoint, transform.position);
+                        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, RotationRate);
                     }
                     break;
                 }
