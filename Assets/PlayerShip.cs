@@ -14,11 +14,14 @@ public class PlayerShip : MonoBehaviour {
     Text _headingText;
     Text _armourText;
     float _lockedRotationUntil;
-
+    float _fuel;
+    Text _fuelText;
     void Start ()
     {
         _rigidbody = GetComponent<Rigidbody>();
         _heading = -DegreeToRadian(transform.eulerAngles.z);
+        _armour = 10;
+        _fuel = 100;
 
         Vector2 anchorMin = Vector2.zero, anchorMax = Vector2.zero;
         int x = 0;
@@ -41,8 +44,9 @@ public class PlayerShip : MonoBehaviour {
         _speed = CreateTextElement(canvas, "Speed", x, -20, anchorMin, anchorMax);
         _headingText = CreateTextElement(canvas, "Heading", x, -40, anchorMin, anchorMax);
         _armourText = CreateTextElement(canvas, "Armour", x, -60, anchorMin, anchorMax);
+        _fuelText = CreateTextElement(canvas, "Fuel", x, -80, anchorMin, anchorMax);
 
-        _armour = 10;
+        
         UpdateArmourText();
 
         _lockedRotationUntil = Time.time;
@@ -70,21 +74,35 @@ public class PlayerShip : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        var horizontal = Input.GetAxis(name + "Horizontal");
-        var vertical = Input.GetAxis(name + "Vertical");
+        if (_fuel > 0)
+        {
+            var horizontal = Input.GetAxis(name + "Horizontal");
+            var vertical = Input.GetAxis(name + "Vertical");
 
-        var speed = (vertical > 0 ? vertical : vertical * .6f) * 20f;
+            var force = (vertical > 0 ? vertical : vertical * .6f) * 15f;
 
-        var sign = speed >= 0 ? 1 : -1;
+            var sign = force >= 0 ? 1 : -1;
 
-        if (_lockedRotationUntil < Time.time)
-            _heading -= sign * (horizontal * 5) * Time.deltaTime;
+            if (_lockedRotationUntil < Time.time)
+                _heading -= sign * (horizontal * 5) * Time.deltaTime;
 
-        transform.eulerAngles = new Vector3(0, 0, RadianToDegree(-_heading));
-        _rigidbody.AddRelativeForce(Vector3.up * speed);
+            transform.eulerAngles = new Vector3(0, 0, RadianToDegree(-_heading));
+            _rigidbody.AddRelativeForce(Vector3.up * force);
+
+            var trigger1 = Input.GetAxis(name + "Trigger2");
+            var turboForce = trigger1 * 10f;
+            _rigidbody.AddRelativeForce(Vector3.up * turboForce);
+
+            var forceApplied = force + turboForce;
+
+            _fuel -= (forceApplied * .001f) + 0.001f;
+        }
 
         _speed.text = "Speed " + Math.Round(_rigidbody.velocity.magnitude * 10, 0);
         _headingText.text = "Heading " + Math.Round(360 - transform.eulerAngles.z, 0);
+        _fuelText.text = "Fuel " + Math.Round(_fuel, 0);
+        if (_fuel < 20f)
+            _fuelText.color = Color.red;
     }
 
     void LockRotation(float duration)
