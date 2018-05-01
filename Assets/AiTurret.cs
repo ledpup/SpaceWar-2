@@ -41,7 +41,7 @@ public class AiTurret : MonoBehaviour
 
             var distanceToTarget = Vector3.Distance(Target.transform.position, transform.position);
 
-            if (distanceToTarget < 10)
+            if (distanceToTarget < 15)
             {
                 _cannon.FireCannon();
             }

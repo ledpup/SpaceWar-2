@@ -22,7 +22,7 @@ public class CameraBehaviour : MonoBehaviour {
 
     public void CameraFollowSmooth(Camera camera, List<Transform> transforms)
     {
-        var zoomFactor = 1f;
+        var zoomFactor = 1.25f;
         var followTimeDelta = 0.01f;
 
         Vector3 cameraDestination;
