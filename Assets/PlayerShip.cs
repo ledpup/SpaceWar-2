@@ -27,18 +27,17 @@ public class PlayerShip : MonoBehaviour {
         int x = 0;
         if (name == "Player1")
         {
-            GetComponent<Renderer>().material.color = Color.green;
             anchorMin = new Vector2(0, 1);
             anchorMax = new Vector2(0, 1);
             x = 20;
         }
         else if (name == "Player2")
         {
-            GetComponent<Renderer>().material.color = Color.red;
             anchorMin = new Vector2(1, 1);
             anchorMax = new Vector2(1, 1);
             x = -100;
         }
+        GetComponent<Renderer>().material.color = Faction.Colour(tag);
 
         var canvas = GameObject.Find("Canvas");
         _speed = CreateTextElement(canvas, "Speed", x, -20, anchorMin, anchorMax);
@@ -46,7 +45,6 @@ public class PlayerShip : MonoBehaviour {
         _armourText = CreateTextElement(canvas, "Armour", x, -60, anchorMin, anchorMax);
         _fuelText = CreateTextElement(canvas, "Fuel", x, -80, anchorMin, anchorMax);
 
-        
         UpdateArmourText();
 
         _lockedRotationUntil = Time.time;
@@ -127,7 +125,7 @@ public class PlayerShip : MonoBehaviour {
             if (contact.otherCollider.gameObject.name.StartsWith("Shot") || contact.otherCollider.gameObject.name.StartsWith("Missile"))
             {
                 var rigidbody = contact.otherCollider.GetComponent<Rigidbody>();
-                var b = rigidbody.velocity.magnitude;
+                //var b = rigidbody.velocity.magnitude;
 
                 var collider = collision.contacts[0].thisCollider;
                 if (collider.name.StartsWith("Missile Launcher") || collider.name.StartsWith("Cannon"))

@@ -4,8 +4,8 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Player1
-  - Player2
+  - Faction1
+  - Faction2
   layers:
   - Default
   - TransparentFX
