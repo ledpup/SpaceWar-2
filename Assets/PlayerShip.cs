@@ -19,7 +19,7 @@ public class PlayerShip : MonoBehaviour {
     void Start ()
     {
         _rigidbody = GetComponent<Rigidbody>();
-        _heading = -DegreeToRadian(transform.eulerAngles.z);
+        _heading = -DegreeToRadian(transform.eulerAngles.y);
         _armour = 10;
         _fuel = 100;
 
@@ -86,7 +86,7 @@ public class PlayerShip : MonoBehaviour {
             if (_lockedRotationUntil < Time.time)
                 _heading -= sign * (horizontal * 5) * Time.deltaTime;
 
-            transform.eulerAngles = new Vector3(0, 0, RadianToDegree(-_heading));
+            transform.eulerAngles = new Vector3(90, RadianToDegree(-_heading), 0);
             _rigidbody.AddRelativeForce(Vector3.up * force);
 
             var trigger1 = Input.GetAxis(name + "Trigger2");
@@ -99,7 +99,7 @@ public class PlayerShip : MonoBehaviour {
         }
 
         _speed.text = "Speed " + Math.Round(_rigidbody.velocity.magnitude * 10, 0);
-        _headingText.text = "Heading " + Math.Round(360 - transform.eulerAngles.z, 0);
+        _headingText.text = "Heading " + Math.Round(360 - transform.eulerAngles.y, 0);
         _fuelText.text = "Fuel " + Math.Round(_fuel, 0);
         if (_fuel < 20f)
             _fuelText.color = Color.red;

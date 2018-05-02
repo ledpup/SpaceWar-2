@@ -50,8 +50,8 @@ public class CameraBehaviour : MonoBehaviour {
             cameraDestination = transforms[0].position;
 
         // Lock the maximum zoom
-        if (cameraDestination.z < 25f)
-            cameraDestination.z = 25f;
+        if (cameraDestination.y < 25f)
+            cameraDestination.y = 25f;
 
 
         if (camera.orthographic)

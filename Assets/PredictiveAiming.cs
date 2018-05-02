@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Assets
 {
+    // http://wiki.unity3d.com/index.php/Calculating_Lead_For_Projectiles
     public class PredictiveAiming
     {
         //first-order intercept using absolute target position

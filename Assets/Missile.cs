@@ -23,13 +23,17 @@ public class Missile : MonoBehaviour
     float _created;
 
     GameObject _targetPoint;
+    Quaternion rotationOffset;
 
     void Start () {
         _rigidbody = GetComponent<Rigidbody>();
-        _heading = -PlayerShip.DegreeToRadian(transform.eulerAngles.z);
+        _heading = -PlayerShip.DegreeToRadian(transform.eulerAngles.y);
         _created = Time.time;
 
-        RotationRate = .9f;
+        RotationRate = .95f;
+
+        // Because I'm using capsules with a 90 degree rotation on x
+        rotationOffset = Quaternion.Euler(90, 0, 0);
 
         if (_missleType == MissleType.Smart)
         {
@@ -54,7 +58,7 @@ public class Missile : MonoBehaviour
                 var horizontal = Input.GetAxis(tag + "Horizontal2");
                 _heading += (horizontal * 5) * Time.deltaTime;
 
-                transform.eulerAngles = new Vector3(0, 0, PlayerShip.RadianToDegree(-_heading));
+                transform.eulerAngles = new Vector3(transform.eulerAngles.x, PlayerShip.RadianToDegree(-_heading), transform.eulerAngles.z);
                 
 
                 break;
@@ -62,7 +66,8 @@ public class Missile : MonoBehaviour
                 {
                     if (_created + .75f < Time.time && _target != null)
                     {
-                        var rotation = Assets.Targeting.RotateToTarget(_target.transform.position, transform.position);
+                        var direction = _target.transform.position - transform.position;
+                        var rotation = Quaternion.LookRotation(direction) * rotationOffset;
                         transform.rotation = Quaternion.Slerp(transform.rotation, rotation, RotationRate);
                     }
                     break;
@@ -77,7 +82,8 @@ public class Missile : MonoBehaviour
                         var targetAimPoint = Assets.PredictiveAiming.FirstOrderIntercept(transform.position, Vector3.zero, projectileSpeed, _target.transform.position, targetRigidBody.velocity);
                         _targetPoint.transform.position = targetAimPoint;
 
-                        var rotation = Assets.Targeting.RotateToTarget(targetAimPoint, transform.position);
+                        var direction = targetAimPoint - transform.position;
+                        var rotation = Quaternion.LookRotation(direction) * rotationOffset;
                         transform.rotation = Quaternion.Slerp(transform.rotation, rotation, RotationRate);
                     }
                     break;
