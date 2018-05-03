@@ -82,9 +82,8 @@ public class PlayerShip : MonoBehaviour {
             var sign = force >= 0 ? 1 : -1;
 
             if (_lockedRotationUntil < Time.time)
-                _heading -= sign * (horizontal * 5) * Time.deltaTime;
+                _rigidbody.AddTorque(transform.forward * 5f * -horizontal);
 
-            transform.eulerAngles = new Vector3(90, RadianToDegree(-_heading), 0);
             _rigidbody.AddRelativeForce(Vector3.up * force);
 
             var trigger1 = Input.GetAxis(name + "Trigger2");

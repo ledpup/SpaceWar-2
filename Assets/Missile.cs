@@ -56,11 +56,7 @@ public class Missile : MonoBehaviour
         {
             case MissleType.Guided:
                 var horizontal = Input.GetAxis(tag + "Horizontal2");
-                _heading += (horizontal * 5) * Time.deltaTime;
-
-                transform.eulerAngles = new Vector3(transform.eulerAngles.x, PlayerShip.RadianToDegree(-_heading), transform.eulerAngles.z);
-                
-
+                _rigidbody.AddTorque(transform.forward * 5f * -horizontal);
                 break;
             case MissleType.Homing:
                 {
