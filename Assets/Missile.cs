@@ -16,24 +16,22 @@ public class Missile : MonoBehaviour
     public GameObject TargetPoint;
     public float RotationRate;
 
-    float _heading;
     Rigidbody _rigidbody;
     MissleType _missleType;
     GameObject _target;
     float _created;
 
     GameObject _targetPoint;
-    Quaternion rotationOffset;
+    Quaternion _rotationOffset;
 
     void Start () {
         _rigidbody = GetComponent<Rigidbody>();
-        _heading = -PlayerShip.DegreeToRadian(transform.eulerAngles.y);
         _created = Time.time;
 
         RotationRate = .95f;
 
         // Because I'm using capsules with a 90 degree rotation on x
-        rotationOffset = Quaternion.Euler(90, 0, 0);
+        _rotationOffset = Quaternion.Euler(90, 0, 0);
 
         if (_missleType == MissleType.Smart)
         {
@@ -63,7 +61,7 @@ public class Missile : MonoBehaviour
                     if (_created + .75f < Time.time && _target != null)
                     {
                         var direction = _target.transform.position - transform.position;
-                        var rotation = Quaternion.LookRotation(direction) * rotationOffset;
+                        var rotation = Quaternion.LookRotation(direction) * _rotationOffset;
                         transform.rotation = Quaternion.Slerp(transform.rotation, rotation, RotationRate);
                     }
                     break;
@@ -72,14 +70,13 @@ public class Missile : MonoBehaviour
                 {
                     if (_created + .75f < Time.time && _target != null)
                     {
-
                         var targetRigidBody = _target.GetComponent<Rigidbody>();
 
                         var targetAimPoint = Assets.PredictiveAiming.FirstOrderIntercept(transform.position, Vector3.zero, projectileSpeed, _target.transform.position, targetRigidBody.velocity);
                         _targetPoint.transform.position = targetAimPoint;
 
                         var direction = targetAimPoint - transform.position;
-                        var rotation = Quaternion.LookRotation(direction) * rotationOffset;
+                        var rotation = Quaternion.LookRotation(direction) * _rotationOffset;
                         transform.rotation = Quaternion.Slerp(transform.rotation, rotation, RotationRate);
                     }
                     break;

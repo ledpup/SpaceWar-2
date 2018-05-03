@@ -13,6 +13,8 @@ public class Faction
                 return Color.green;
             case "Faction2":
                 return Color.red;
+            case "Faction3":
+                return Color.magenta;
         }
         return Color.yellow;
     }

@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Faction1
   - Faction2
+  - Faction3
+  - Player1
+  - Player2
   layers:
   - Default
   - TransparentFX
