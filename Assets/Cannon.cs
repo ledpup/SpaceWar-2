@@ -3,8 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class Cannon : MonoBehaviour
+public class Cannon : NetworkBehaviour
 {
     //public GameObject CannonObject;
     public GameObject Shot;
@@ -15,6 +16,13 @@ public class Cannon : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        var ni = transform.GetComponent<NetworkIdentity>();
+        if (ni != null && !isLocalPlayer)
+        {
+            Destroy(this);
+            return;
+        }
+
         var parent = transform.parent;
         try
         {

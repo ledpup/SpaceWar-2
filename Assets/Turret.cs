@@ -19,7 +19,7 @@ public class Turret : MonoBehaviour, ITargeting
     // Use this for initialization
     void Start ()
     {
-        _factions = UnityEditorInternal.InternalEditorUtility.tags.Where(x => x.StartsWith("Faction")).ToList();
+        _factions = new List<string> { "Faction1", "Faction2", "Faction3" };
 
         _players = new List<GameObject>();
         _factions.ForEach(x => _players.AddRange(GameObject.FindGameObjectsWithTag(x)));

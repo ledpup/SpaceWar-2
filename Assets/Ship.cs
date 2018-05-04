@@ -4,13 +4,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class Ship : MonoBehaviour, ITargeting
+public class Ship : NetworkBehaviour, ITargeting
 {
 
     public GameObject Target { get; set; }
     Rigidbody _targetRigidBody;
+
+    public bool AddForce;
+    public bool AddTorque = true;
+    public bool ApplyRotation;
 
     float _armour;
     Rigidbody _rigidbody;
@@ -23,16 +28,30 @@ public class Ship : MonoBehaviour, ITargeting
     Cannon _cannon;
     Quaternion _rotationOffset;
     List<string> _factions;
+    List<GameObject> _players;
     void Start ()
     {
+        var ni = transform.GetComponent<NetworkIdentity>();
+        if (ni != null && !isLocalPlayer)
+        {
+            Destroy(this);
+            return;
+        }
+
         // Because I'm using capsules with a 90 degree rotation on x
-        _rotationOffset = Quaternion.Euler(90, 0, 0);
+        if (ApplyRotation)
+        {
+            transform.rotation = Quaternion.Euler(90, 0, 0);
+            _rotationOffset = Quaternion.Euler(transform.rotation.eulerAngles.x, 0, 0);
+        }
 
         _rigidbody = GetComponent<Rigidbody>();
         _armour = 10;
         _fuel = 100;
 
-        _factions = UnityEditorInternal.InternalEditorUtility.tags.Where(x => x.StartsWith("Faction")).ToList();
+        _factions = new List<string> { "Faction1", "Faction2", "Faction3" };
+        _players = new List<GameObject>();
+        _factions.ForEach(x => _players.AddRange(GameObject.FindGameObjectsWithTag(x)));
 
         if (name.StartsWith("Player"))
         {
@@ -62,8 +81,7 @@ public class Ship : MonoBehaviour, ITargeting
         }
         else
         {
-            Target = Targeting.AquireTaget(tag, transform.position, _factions);
-            _targetRigidBody = Target.GetComponent<Rigidbody>();
+            AquireTarget();
         }
 
         GetComponent<Renderer>().material.color = Faction.Colour(tag);
@@ -102,16 +120,28 @@ public class Ship : MonoBehaviour, ITargeting
             float force = 0, turboForce = 0;
             if (name.StartsWith("Player"))
             {
-                var horizontal = Input.GetAxis(name + "Horizontal");
+                var controllerName = name.Replace("(Clone)", "");
+                var horizontal = Input.GetAxis(controllerName + "Horizontal");
                 if (_lockedRotationUntil < Time.time)
                     _rigidbody.AddTorque(transform.forward * 5f * -horizontal);
 
-                var vertical = Input.GetAxis(name + "Vertical");
+                var vertical = Input.GetAxis(controllerName + "Vertical");
                 force = (vertical > 0 ? vertical : vertical * .8f) * 15f;
 
-                var trigger1 = Input.GetAxis(name + "Trigger2");
+                var trigger1 = Input.GetAxis(controllerName + "Trigger2");
                 turboForce = trigger1 * 10f;
                 
+            }
+            else if (tag == "Untagged")
+            {
+                _players.RemoveAll(item => item == null);
+                var collector = _players.FirstOrDefault(x => Vector3.Distance(x.transform.position, transform.position) < 5);
+                if (collector != null)
+                {
+                    tag = collector.tag;
+                    GetComponent<Renderer>().material.color = Faction.Colour(tag);
+                    AquireTarget();
+                }
             }
             else if (Target != null)
             {
@@ -132,13 +162,16 @@ public class Ship : MonoBehaviour, ITargeting
             }
             else
             {
-                Target = Targeting.AquireTaget(tag, transform.position, _factions);
-                _targetRigidBody = Target.GetComponent<Rigidbody>();
+                AquireTarget();
             }
 
-            _rigidbody.AddRelativeForce(Vector3.up * force);
-            _rigidbody.AddRelativeForce(Vector3.up * turboForce);
-            var forceApplied = force + turboForce;
+            float forceApplied = 0;
+            if (AddForce)
+            {
+                _rigidbody.AddRelativeForce(Vector3.up * force);
+                _rigidbody.AddRelativeForce(Vector3.up * turboForce);
+                forceApplied = force + turboForce;
+            }
             _fuel -= (forceApplied * .001f) + 0.001f;
         }
 
@@ -202,5 +235,12 @@ public class Ship : MonoBehaviour, ITargeting
     {
         if (_armourText != null)
             _armourText.text = "Armour " + Mathf.RoundToInt(_armour * 10).ToString();
+    }
+
+    private void AquireTarget()
+    {
+        Target = Targeting.AquireTaget(tag, transform.position, _factions);
+        if (Target != null)
+            _targetRigidBody = Target.GetComponent<Rigidbody>();
     }
 }
