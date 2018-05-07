@@ -26,7 +26,8 @@ public class Cannon : NetworkBehaviour
         var parent = transform.parent;
         try
         {
-            Input.GetButton(parent.name + "Fire1");
+            GetButton(parent.name, "Fire1");
+            
             _manualFireButtonValid = true;
         }
         catch (Exception ex)
@@ -35,28 +36,35 @@ public class Cannon : NetworkBehaviour
         }
     }
 
+    private bool GetButton(string controllerName, string buttonName)
+    {
+        controllerName = controllerName.Replace("(Clone)", "");
+        return Input.GetButton(controllerName + buttonName);
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if (_manualFireButtonValid && Input.GetButton(transform.parent.name + "Fire1"))
+        if (_manualFireButtonValid && GetButton(transform.parent.name, "Fire1"))
         {
-            FireCannon();
+            CmdFireCannon();
         }
         else
         {
             var targetingParent = transform.parent.GetComponentInParent<ITargeting>();
-            if (targetingParent.Target != null)
+            if (targetingParent != null && targetingParent.Target != null)
             {
                 var distanceToTarget = Vector3.Distance(targetingParent.Target.transform.position, transform.position);
                 if (distanceToTarget < 15)
                 {
-                    FireCannon();
+                    CmdFireCannon();
                 }
             }
         }
     }
 
-    internal void FireCannon()
+    [Command]
+    internal void CmdFireCannon()
     {
         if (Time.time > nextFire)
         {
@@ -64,15 +72,17 @@ public class Cannon : NetworkBehaviour
 
             var shot = Instantiate(Shot, transform.position, transform.rotation) as GameObject;
 
-            var bulletRigidBody = shot.GetComponent<Rigidbody>();
+            var shotRigidBody = shot.GetComponent<Rigidbody>();
 
             var shipRigidBody = transform.parent.GetComponent<Rigidbody>();
 
-            bulletRigidBody.velocity = shipRigidBody.velocity;
-            bulletRigidBody.AddForce(transform.up * ShotForce);
+            shotRigidBody.velocity = shipRigidBody.velocity;
+            shotRigidBody.AddForce(transform.up * ShotForce);
             shipRigidBody.AddForce(transform.up * (-ShotForce * .1f)); // Unrealistic recoil (for fun!)
 
             Destroy(shot, 3.0f);
+
+            NetworkServer.Spawn(shot);
         }
     }
 }

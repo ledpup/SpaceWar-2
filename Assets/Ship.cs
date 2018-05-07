@@ -15,7 +15,6 @@ public class Ship : NetworkBehaviour, ITargeting
 
     public bool AddForce;
     public bool AddTorque = true;
-    public bool ApplyRotation;
 
     float _armour;
     Rigidbody _rigidbody;
@@ -26,9 +25,15 @@ public class Ship : NetworkBehaviour, ITargeting
     float _fuel;
     Text _fuelText;
     Cannon _cannon;
-    Quaternion _rotationOffset;
     List<string> _factions;
     List<GameObject> _players;
+    string _controllerName;
+
+    public GameObject Shot;
+    public float ShotForce = 500f;
+    public float FiringRate = .3f;
+    float _nextFire;
+    bool _manualFireButtonValid;
     void Start ()
     {
         var ni = transform.GetComponent<NetworkIdentity>();
@@ -36,13 +41,6 @@ public class Ship : NetworkBehaviour, ITargeting
         {
             Destroy(this);
             return;
-        }
-
-        // Because I'm using capsules with a 90 degree rotation on x
-        if (ApplyRotation)
-        {
-            transform.rotation = Quaternion.Euler(90, 0, 0);
-            _rotationOffset = Quaternion.Euler(transform.rotation.eulerAngles.x, 0, 0);
         }
 
         _rigidbody = GetComponent<Rigidbody>();
@@ -53,18 +51,20 @@ public class Ship : NetworkBehaviour, ITargeting
         _players = new List<GameObject>();
         _factions.ForEach(x => _players.AddRange(GameObject.FindGameObjectsWithTag(x)));
 
-        if (name.StartsWith("Player"))
+        _controllerName = name.Replace("(Clone)", "");
+
+        if (_controllerName.StartsWith("Player"))
         {
 
             Vector2 anchorMin = Vector2.zero, anchorMax = Vector2.zero;
             int x = 0;
-            if (name == "Player1")
+            if (_controllerName == "Player1")
             {
                 anchorMin = new Vector2(0, 1);
                 anchorMax = new Vector2(0, 1);
                 x = 20;
             }
-            else if (name == "Player2")
+            else if (_controllerName == "Player2")
             {
                 anchorMin = new Vector2(1, 1);
                 anchorMax = new Vector2(1, 1);
@@ -72,11 +72,11 @@ public class Ship : NetworkBehaviour, ITargeting
             }
 
             var canvas = GameObject.Find("Canvas");
-            _nameText = CreateTextElement(canvas, "Name", x, -20, anchorMin, anchorMax);
-            _speedText = CreateTextElement(canvas, "Speed", x, -40, anchorMin, anchorMax);
-            _armourText = CreateTextElement(canvas, "Armour", x, -60, anchorMin, anchorMax);
-            _fuelText = CreateTextElement(canvas, "Fuel", x, -80, anchorMin, anchorMax);
-            _nameText.text = name;
+            _nameText = CreateTextElement(canvas, _controllerName, "Name", x, -20, anchorMin, anchorMax);
+            _speedText = CreateTextElement(canvas, _controllerName, "Speed", x, -40, anchorMin, anchorMax);
+            _armourText = CreateTextElement(canvas, _controllerName, "Armour", x, -60, anchorMin, anchorMax);
+            _fuelText = CreateTextElement(canvas, _controllerName, "Fuel", x, -80, anchorMin, anchorMax);
+            _nameText.text = _controllerName;
             _nameText.color = Faction.Colour(tag);
         }
         else
@@ -91,11 +91,24 @@ public class Ship : NetworkBehaviour, ITargeting
         UpdateArmourText();
 
         _lockedRotationUntil = Time.time;
+
+
+        try
+        {
+            Input.GetButton(_controllerName + "Fire1");
+
+            _manualFireButtonValid = true;
+        }
+        catch (Exception ex)
+        {
+            _manualFireButtonValid = false;
+        }
     }
 
-    private Text CreateTextElement(GameObject canvas, string elementName, int x, int y, Vector2 anchorMin, Vector2 anchorMax)
+    private Text CreateTextElement(GameObject canvas, string controllerName, string elementName, int x, int y, Vector2 anchorMin, Vector2 anchorMax)
     {
-        var go = new GameObject(name + elementName);
+        
+        var go = new GameObject(controllerName + elementName);
         go.transform.parent = canvas.transform;
 
         var text = go.AddComponent<Text>();
@@ -114,16 +127,57 @@ public class Ship : NetworkBehaviour, ITargeting
         return text;
     }
 
+    void Update()
+    {
+        if (_manualFireButtonValid && Input.GetButton(_controllerName + "Fire1"))
+        {
+            CmdFireCannon();
+        }
+        //else
+        //{
+        //    if (Target != null)
+        //    {
+        //        var distanceToTarget = Vector3.Distance(Target.transform.position, transform.position);
+        //        if (distanceToTarget < 15)
+        //        {
+        //            CmdFireCannon();
+        //        }
+        //    }
+        //}
+    }
+
+    [Command]
+    internal void CmdFireCannon()
+    {
+        if (Time.time > _nextFire)
+        {
+            _nextFire = Time.time + FiringRate;
+
+            var shot = Instantiate(Shot, transform.position + (transform.forward * 1.6f), transform.rotation) as GameObject;
+
+            var shotRigidBody = shot.GetComponent<Rigidbody>();
+
+            var shipRigidBody = transform.GetComponent<Rigidbody>();
+
+            shotRigidBody.velocity = shipRigidBody.velocity;
+            shotRigidBody.AddForce(transform.forward * ShotForce);
+            shipRigidBody.AddForce(transform.forward * (-ShotForce * .1f)); // Unrealistic recoil (for fun!)
+
+            Destroy(shot, 3.0f);
+
+            NetworkServer.Spawn(shot);
+        }
+    }
     void FixedUpdate() {
         if (_fuel > 0)
         {
             float force = 0, turboForce = 0;
-            if (name.StartsWith("Player"))
+            if (_controllerName.StartsWith("Player"))
             {
                 var controllerName = name.Replace("(Clone)", "");
                 var horizontal = Input.GetAxis(controllerName + "Horizontal");
                 if (_lockedRotationUntil < Time.time)
-                    _rigidbody.AddTorque(transform.forward * 5f * -horizontal);
+                    _rigidbody.AddTorque(transform.up * 5f * horizontal);
 
                 var vertical = Input.GetAxis(controllerName + "Vertical");
                 force = (vertical > 0 ? vertical : vertical * .8f) * 15f;
@@ -155,7 +209,7 @@ public class Ship : NetworkBehaviour, ITargeting
 
                 var interceptPoint = PredictiveAiming.FirstOrderIntercept(transform.position, Vector3.zero, projectileSpeed, Target.transform.position, _targetRigidBody.velocity);
                 var direction = interceptPoint - transform.position;
-                var rotation = Quaternion.LookRotation(direction) * _rotationOffset;
+                var rotation = Quaternion.LookRotation(direction);
                 transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 5f * Time.fixedDeltaTime);
 
                 force = 7f;
@@ -168,8 +222,8 @@ public class Ship : NetworkBehaviour, ITargeting
             float forceApplied = 0;
             if (AddForce)
             {
-                _rigidbody.AddRelativeForce(Vector3.up * force);
-                _rigidbody.AddRelativeForce(Vector3.up * turboForce);
+                _rigidbody.AddRelativeForce(Vector3.forward * force);
+                _rigidbody.AddRelativeForce(Vector3.forward * turboForce);
                 forceApplied = force + turboForce;
             }
             _fuel -= (forceApplied * .001f) + 0.001f;

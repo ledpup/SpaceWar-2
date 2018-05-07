@@ -1,17 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class Shot : MonoBehaviour {
+public class Shot : NetworkBehaviour
+{
+    [SerializeField] float ShellLifeTime = 3f;
 
-	void Start ()
+    float _age;
+    void Start ()
     {
         
     }
 	
-	// Update is called once per frame
-	void Update () {
-        //var mag = transform.GetComponent<Rigidbody>().velocity.magnitude;
+	[ServerCallback]
+	void Update ()
+    {
+        _age += Time.deltaTime;
+        if (_age > ShellLifeTime)
+            NetworkServer.Destroy(gameObject);
 	}
 
     void OnCollisionEnter(Collision collision)

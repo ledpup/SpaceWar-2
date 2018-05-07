@@ -22,16 +22,12 @@ public class Missile : MonoBehaviour
     float _created;
 
     GameObject _targetPoint;
-    Quaternion _rotationOffset;
 
     void Start () {
         _rigidbody = GetComponent<Rigidbody>();
         _created = Time.time;
 
         RotationRate = .95f;
-
-        // Because I'm using capsules with a 90 degree rotation on x
-        _rotationOffset = Quaternion.Euler(90, 0, 0);
 
         if (_missleType == MissleType.Smart)
         {
@@ -54,14 +50,14 @@ public class Missile : MonoBehaviour
         {
             case MissleType.Guided:
                 var horizontal = Input.GetAxis(tag + "Horizontal2");
-                _rigidbody.AddTorque(transform.forward * 5f * -horizontal);
+                _rigidbody.AddTorque(transform.up * 5f * horizontal);
                 break;
             case MissleType.Homing:
                 {
                     if (_created + .75f < Time.time && _target != null)
                     {
                         var direction = _target.transform.position - transform.position;
-                        var rotation = Quaternion.LookRotation(direction) * _rotationOffset;
+                        var rotation = Quaternion.LookRotation(direction);
                         transform.rotation = Quaternion.Slerp(transform.rotation, rotation, RotationRate);
                     }
                     break;
@@ -76,14 +72,14 @@ public class Missile : MonoBehaviour
                         _targetPoint.transform.position = targetAimPoint;
 
                         var direction = targetAimPoint - transform.position;
-                        var rotation = Quaternion.LookRotation(direction) * _rotationOffset;
+                        var rotation = Quaternion.LookRotation(direction);
                         transform.rotation = Quaternion.Slerp(transform.rotation, rotation, RotationRate);
                     }
                     break;
                 }
         }
 
-        _rigidbody.AddRelativeForce(Vector3.up * projectileSpeed);
+        _rigidbody.AddRelativeForce(Vector3.forward * projectileSpeed);
     }
 
     void SetMissileType(MissleType missleType)
