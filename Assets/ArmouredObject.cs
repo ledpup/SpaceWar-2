@@ -22,7 +22,7 @@ namespace Assets
             _armour = Armour;
             _playerHud = gameObject.GetComponent<PlayerHud>();
 
-            RpcUpdateArmourText();
+            RpcClientAfterCollision();
         }
 
         public void TakeDamage(float amount)
@@ -31,7 +31,7 @@ namespace Assets
                 return;
 
             _armour -= amount;
-            RpcUpdateArmourText();
+            RpcClientAfterCollision();
 
             if (_armour <= 0)
             {
@@ -48,10 +48,14 @@ namespace Assets
         }
 
         [ClientRpc]
-        private void RpcUpdateArmourText()
+        private void RpcClientAfterCollision()
         {
-            if (isLocalPlayer && _playerHud != null)
-                _playerHud.ArmourText.text = "Armour " + Mathf.RoundToInt(_armour * 10).ToString();
+            if (isLocalPlayer)
+            {
+                if (_playerHud != null)
+                    _playerHud.ArmourText.text = "Armour " + Mathf.RoundToInt(_armour * 10).ToString();
+
+            }
         }
     }
 }

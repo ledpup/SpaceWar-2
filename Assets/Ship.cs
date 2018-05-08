@@ -57,7 +57,7 @@ public class Ship : NetworkBehaviour, ITargeting
 
         if (!name.StartsWith("Player"))
         {
-            AquireTarget();
+            AcquireTarget();
         }
 
         GetComponent<Renderer>().material.color = Faction.Colour(tag);
@@ -117,8 +117,6 @@ public class Ship : NetworkBehaviour, ITargeting
             shotRigidBody.AddForce(transform.forward * ShotForce);
             shipRigidBody.AddForce(transform.forward * (-ShotForce * .1f)); // Unrealistic recoil (for fun!)
 
-            Destroy(shot, 3.0f);
-
             NetworkServer.Spawn(shot);
         }
     }
@@ -148,7 +146,7 @@ public class Ship : NetworkBehaviour, ITargeting
                 {
                     tag = collector.tag;
                     GetComponent<Renderer>().material.color = Faction.Colour(tag);
-                    AquireTarget();
+                    AcquireTarget();
                 }
             }
             else if (Target != null)
@@ -170,7 +168,7 @@ public class Ship : NetworkBehaviour, ITargeting
             }
             else
             {
-                AquireTarget();
+                AcquireTarget();
             }
 
             float forceApplied = 0;
@@ -215,7 +213,7 @@ public class Ship : NetworkBehaviour, ITargeting
         }
     }
 
-    private void AquireTarget()
+    private void AcquireTarget()
     {
         Target = Targeting.AquireTaget(tag, transform.position, _factions);
         if (Target != null)
