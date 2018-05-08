@@ -16,14 +16,13 @@ public class Ship : NetworkBehaviour, ITargeting
     public bool AddForce;
     public bool AddTorque = true;
 
-    float _armour;
+    public float Armour { get; set; }
     Rigidbody _rigidbody;
-    Text _speedText;
-    Text _nameText;
-    Text _armourText;
+
+
     float _lockedRotationUntil;
     float _fuel;
-    Text _fuelText;
+
     Cannon _cannon;
     List<string> _factions;
     List<GameObject> _players;
@@ -34,6 +33,7 @@ public class Ship : NetworkBehaviour, ITargeting
     public float FiringRate = .3f;
     float _nextFire;
     bool _manualFireButtonValid;
+    PlayerHud _playerHud;
     void Start ()
     {
         var ni = transform.GetComponent<NetworkIdentity>();
@@ -43,43 +43,19 @@ public class Ship : NetworkBehaviour, ITargeting
             return;
         }
 
+        _controllerName = name.Replace("(Clone)", "");
+
         _rigidbody = GetComponent<Rigidbody>();
-        _armour = 10;
+        Armour = 10;
         _fuel = 100;
 
         _factions = new List<string> { "Faction1", "Faction2", "Faction3" };
         _players = new List<GameObject>();
         _factions.ForEach(x => _players.AddRange(GameObject.FindGameObjectsWithTag(x)));
 
-        _controllerName = name.Replace("(Clone)", "");
+        _playerHud = gameObject.GetComponent<PlayerHud>();
 
-        if (_controllerName.StartsWith("Player"))
-        {
-
-            Vector2 anchorMin = Vector2.zero, anchorMax = Vector2.zero;
-            int x = 0;
-            if (_controllerName == "Player1")
-            {
-                anchorMin = new Vector2(0, 1);
-                anchorMax = new Vector2(0, 1);
-                x = 20;
-            }
-            else if (_controllerName == "Player2")
-            {
-                anchorMin = new Vector2(1, 1);
-                anchorMax = new Vector2(1, 1);
-                x = -100;
-            }
-
-            var canvas = GameObject.Find("Canvas");
-            _nameText = CreateTextElement(canvas, _controllerName, "Name", x, -20, anchorMin, anchorMax);
-            _speedText = CreateTextElement(canvas, _controllerName, "Speed", x, -40, anchorMin, anchorMax);
-            _armourText = CreateTextElement(canvas, _controllerName, "Armour", x, -60, anchorMin, anchorMax);
-            _fuelText = CreateTextElement(canvas, _controllerName, "Fuel", x, -80, anchorMin, anchorMax);
-            _nameText.text = _controllerName;
-            _nameText.color = Faction.Colour(tag);
-        }
-        else
+        if (!name.StartsWith("Player"))
         {
             AquireTarget();
         }
@@ -87,8 +63,6 @@ public class Ship : NetworkBehaviour, ITargeting
         GetComponent<Renderer>().material.color = Faction.Colour(tag);
 
         _cannon = gameObject.GetComponentInChildren<Cannon>();
-
-        UpdateArmourText();
 
         _lockedRotationUntil = Time.time;
 
@@ -105,27 +79,7 @@ public class Ship : NetworkBehaviour, ITargeting
         }
     }
 
-    private Text CreateTextElement(GameObject canvas, string controllerName, string elementName, int x, int y, Vector2 anchorMin, Vector2 anchorMax)
-    {
-        
-        var go = new GameObject(controllerName + elementName);
-        go.transform.parent = canvas.transform;
 
-        var text = go.AddComponent<Text>();
-
-        var rectTransform = text.GetComponent<RectTransform>();
-
-        rectTransform.anchorMin = anchorMin;
-        rectTransform.anchorMax = anchorMax;
-        rectTransform.pivot = new Vector2(0, 1);
-        rectTransform.offsetMin = new Vector2(x, y - 30f);
-        rectTransform.offsetMax = new Vector2(x + 160f, y);
-
-        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        text.color = Color.white;
-
-        return text;
-    }
 
     void Update()
     {
@@ -184,7 +138,7 @@ public class Ship : NetworkBehaviour, ITargeting
 
                 var trigger1 = Input.GetAxis(controllerName + "Trigger2");
                 turboForce = trigger1 * 10f;
-                
+
             }
             else if (tag == "Untagged")
             {
@@ -229,14 +183,12 @@ public class Ship : NetworkBehaviour, ITargeting
             _fuel -= (forceApplied * .001f) + 0.001f;
         }
 
-        if (_speedText != null)
-            _speedText.text = "Speed " + Math.Round(_rigidbody.velocity.magnitude * 10, 0);
-        //_headingText.text = "Heading " + Math.Round(360 - transform.eulerAngles.y, 0);
-        if (_fuelText != null)
+        if (_playerHud != null)
         {
-            _fuelText.text = "Fuel " + Math.Round(_fuel, 0);
+            _playerHud.SpeedText.text = "Speed " + Math.Round(_rigidbody.velocity.magnitude * 10, 0);
+            _playerHud.FuelText.text = "Fuel " + Math.Round(_fuel, 0);
             if (_fuel < 20f)
-                _fuelText.color = Color.red;
+                _playerHud.FuelText.color = Color.red;
         }
     }
 
@@ -259,36 +211,8 @@ public class Ship : NetworkBehaviour, ITargeting
     {
         foreach (ContactPoint contact in collision.contacts)
         {
-            if (contact.otherCollider.gameObject.name.StartsWith("Shot") || contact.otherCollider.gameObject.name.StartsWith("Missile"))
-            {
-                var rigidbody = contact.otherCollider.GetComponent<Rigidbody>();
-                //var b = rigidbody.velocity.magnitude;
-
-                var collider = collision.contacts[0].thisCollider;
-                if (collider.name.StartsWith("Missile Launcher") || collider.name.StartsWith("Cannon"))
-                {
-                    // Change this later to damage child components rather than destroying them outright
-                    Destroy(collider.gameObject);
-                }
-                else
-                {
-                    _armour -= rigidbody.velocity.magnitude / 5f;
-
-                    if (_armour < 0)
-                    {
-                        Destroy(contact.thisCollider.gameObject);
-                    }
-
-                    UpdateArmourText();
-                }
-            }
+            
         }
-    }
-
-    private void UpdateArmourText()
-    {
-        if (_armourText != null)
-            _armourText.text = "Armour " + Mathf.RoundToInt(_armour * 10).ToString();
     }
 
     private void AquireTarget()

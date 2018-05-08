@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.Networking;
 
 public enum MissleType
 {
@@ -11,7 +11,7 @@ public enum MissleType
     Homing,
     Smart,
 }
-public class Missile : MonoBehaviour
+public class Missile : NetworkBehaviour
 {
     public GameObject TargetPoint;
     public float RotationRate;
@@ -69,7 +69,6 @@ public class Missile : MonoBehaviour
                         var targetRigidBody = _target.GetComponent<Rigidbody>();
 
                         var targetAimPoint = Assets.PredictiveAiming.FirstOrderIntercept(transform.position, Vector3.zero, projectileSpeed, _target.transform.position, targetRigidBody.velocity);
-                        _targetPoint.transform.position = targetAimPoint;
 
                         var direction = targetAimPoint - transform.position;
                         var rotation = Quaternion.LookRotation(direction);

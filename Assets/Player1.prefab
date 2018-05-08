@@ -45,6 +45,8 @@ GameObject:
   - component: {fileID: 114436022974994374}
   - component: {fileID: 114746937116697662}
   - component: {fileID: 114878103132752294}
+  - component: {fileID: 114842185744558874}
+  - component: {fileID: 114585677448201562}
   m_Layer: 0
   m_Name: Player1
   m_TagString: Faction1
@@ -281,6 +283,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Missile: {fileID: 1210607065665294, guid: 88f51ccd0ea19ec45a020ee431937154, type: 2}
   FiringRate: 0.5
+--- !u!114 &114585677448201562
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1685283556975016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5989e42fd609304cb807951f4ae3838, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpeedText: {fileID: 0}
+  NameText: {fileID: 0}
+  ArmourText: {fileID: 0}
+  FuelText: {fileID: 0}
 --- !u!114 &114746937116697662
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -313,6 +330,19 @@ MonoBehaviour:
     i15: 121
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
+--- !u!114 &114842185744558874
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1685283556975016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 435e0b0fa61f1dd4da554d1504d4482b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Armour: 10
+  ArmourText: {fileID: 0}
 --- !u!114 &114878103132752294
 MonoBehaviour:
   m_ObjectHideFlags: 1

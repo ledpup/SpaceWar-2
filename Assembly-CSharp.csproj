@@ -59,12 +59,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\ArmouredObject.cs" />
     <Compile Include="Assets\CameraBehaviour.cs" />
     <Compile Include="Assets\Cannon.cs" />
     <Compile Include="Assets\Faction.cs" />
     <Compile Include="Assets\ITargeting.cs" />
     <Compile Include="Assets\Missile.cs" />
     <Compile Include="Assets\MissileLauncher.cs" />
+    <Compile Include="Assets\PlayerHud.cs" />
     <Compile Include="Assets\PredictiveAiming.cs" />
     <Compile Include="Assets\Ship.cs" />
     <Compile Include="Assets\Shot.cs" />
