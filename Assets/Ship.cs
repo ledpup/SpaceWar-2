@@ -39,7 +39,6 @@ public class Ship : NetworkBehaviour, ITargeting
         var ni = transform.GetComponent<NetworkIdentity>();
         if (ni != null && !isLocalPlayer)
         {
-            Destroy(this);
             return;
         }
 
@@ -60,8 +59,6 @@ public class Ship : NetworkBehaviour, ITargeting
             AcquireTarget();
         }
 
-        GetComponent<Renderer>().material.color = Faction.Colour(tag);
-
         _cannon = gameObject.GetComponentInChildren<Cannon>();
 
         _lockedRotationUntil = Time.time;
@@ -79,7 +76,10 @@ public class Ship : NetworkBehaviour, ITargeting
         }
     }
 
-
+    public override void OnStartLocalPlayer()
+    {
+        GetComponent<Renderer>().material.color = Faction.Colour(tag);
+    }
 
     void Update()
     {
@@ -203,14 +203,6 @@ public class Ship : NetworkBehaviour, ITargeting
     public static float RadianToDegree(float angle)
     {
         return (float)(angle * (180.0 / Math.PI));
-    }
-
-    void OnCollisionEnter(Collision collision)
-    {
-        foreach (ContactPoint contact in collision.contacts)
-        {
-            
-        }
     }
 
     private void AcquireTarget()

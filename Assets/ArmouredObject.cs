@@ -22,16 +22,33 @@ namespace Assets
             _armour = Armour;
             _playerHud = gameObject.GetComponent<PlayerHud>();
 
-            RpcClientAfterCollision();
+            RpcUpdateHud(Vector3.zero);
         }
 
-        public void TakeDamage(float amount)
+        public void TakeDamage(float amount, Vector3 vector, bool componentDamaged, string componentName)
         {
             if (!isServer || _armour <= 0)
                 return;
 
-            _armour -= amount;
-            RpcClientAfterCollision();
+            if (componentDamaged)
+            {
+                var componentTransform = transform.Find(componentName);
+                var component = componentTransform.GetComponent<IComponent>();
+                var destroyed = component.TakeDamage(amount);
+                if (destroyed)
+                {
+                    componentTransform.parent = null;
+                    NetworkServer.Destroy(componentTransform.gameObject);
+
+                    //RpcDestroySubcomponent(GetComponent<NetworkIdentity>().netId, componentName);
+                }
+            }
+            else
+            {
+                _armour -= amount;
+                RpcUpdateHud(vector);
+            }
+            
 
             if (_armour <= 0)
             {
@@ -48,8 +65,21 @@ namespace Assets
         }
 
         [ClientRpc]
-        private void RpcClientAfterCollision()
+        private void RpcDestroySubcomponent(NetworkInstanceId networkInstanceId, string component)
         {
+            var localObject = ClientScene.FindLocalObject(networkInstanceId);
+            var componentTransform = localObject.transform.Find(component);
+            if (componentTransform != null)
+                Destroy(componentTransform.gameObject);
+
+        }
+
+        [ClientRpc]
+        private void RpcUpdateHud(Vector3 vector)
+        {
+            var rigidbody = transform.GetComponent<Rigidbody>();
+
+            rigidbody.AddForce(vector);
             if (isLocalPlayer)
             {
                 if (_playerHud != null)
@@ -59,3 +89,4 @@ namespace Assets
         }
     }
 }
+;

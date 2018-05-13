@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class Cannon : NetworkBehaviour
+public class Cannon : NetworkBehaviour, IComponent
 {
     //public GameObject CannonObject;
     public GameObject Shot;
@@ -14,6 +14,8 @@ public class Cannon : NetworkBehaviour
     float nextFire;
     bool _manualFireButtonValid;
     // Use this for initialization
+    [SyncVar] float _armour;
+
     void Start()
     {
         var ni = transform.GetComponent<NetworkIdentity>();
@@ -35,6 +37,18 @@ public class Cannon : NetworkBehaviour
             _manualFireButtonValid = false;
         }
     }
+
+    public bool TakeDamage(float amount)
+    {
+        _armour -= amount;
+
+        if (_armour <= 0)
+        {
+            _armour = 0;
+        }
+        return _armour <= 0;
+    }
+
 
     private bool GetButton(string controllerName, string buttonName)
     {
@@ -77,10 +91,8 @@ public class Cannon : NetworkBehaviour
             var shipRigidBody = transform.parent.GetComponent<Rigidbody>();
 
             shotRigidBody.velocity = shipRigidBody.velocity;
-            shotRigidBody.AddForce(transform.up * ShotForce);
-            shipRigidBody.AddForce(transform.up * (-ShotForce * .1f)); // Unrealistic recoil (for fun!)
-
-            Destroy(shot, 3.0f);
+            shotRigidBody.AddForce(transform.forward * ShotForce);
+            shipRigidBody.AddForce(transform.forward * (-ShotForce * .1f)); // Unrealistic recoil (for fun!)
 
             NetworkServer.Spawn(shot);
         }

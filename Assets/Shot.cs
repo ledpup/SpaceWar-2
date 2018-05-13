@@ -37,23 +37,18 @@ public class Shot : NetworkBehaviour
                 return;
             }
 
-            var damageableObject = collision.contacts[0].otherCollider.GetComponent<ArmouredObject>();
+            var parent = collision.contacts[0].otherCollider.transform.parent;
 
-            if (damageableObject != null)
+            var armouredObject = parent == null ? collision.contacts[0].otherCollider.GetComponent<ArmouredObject>() : parent.GetComponent<ArmouredObject>();
+
+            if (armouredObject != null)
             {
-                var thisRigidbody = contact.thisCollider.GetComponent<Rigidbody>();
-                var otherRigidbody = contact.otherCollider.GetComponent<Rigidbody>();
+                var thisRigidbody = contact.thisCollider.attachedRigidbody;
+                var otherRigidbody = contact.otherCollider.attachedRigidbody;
 
-                var damage = (thisRigidbody.velocity - otherRigidbody.velocity).magnitude / 5f;
-                damageableObject.TakeDamage(damage);
+                var damage = (thisRigidbody.velocity - otherRigidbody.velocity).magnitude / 2f;
+                armouredObject.TakeDamage(damage, thisRigidbody.velocity / Time.fixedDeltaTime, parent != null, collision.contacts[0].otherCollider.gameObject.name);
             }
         }
-    }
-
-    public void TakeDamage(float damage)
-    {
-        Armour -= damage;
-        if (Armour < 0)
-            Destroy(gameObject);
     }
 }

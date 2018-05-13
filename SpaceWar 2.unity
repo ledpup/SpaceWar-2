@@ -443,7 +443,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 111f4ad48654cd14da2abf81783c797d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RotationRate: 2
+  RotationRate: 0
 --- !u!54 &313660019
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -539,8 +539,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AddForce: 0
-  AddTorque: 0
-  Shot: {fileID: 1371502934080192, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
+  AddTorque: 1
+  Shot: {fileID: 0}
   ShotForce: 500
   FiringRate: 0.3
 --- !u!1 &322858842
@@ -715,9 +715,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08f3b79cc55316944939f184136ca2f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AddForce: 1
-  AddTorque: 0
-  Shot: {fileID: 1371502934080192, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
+  AddForce: 0
+  AddTorque: 1
+  Shot: {fileID: 0}
   ShotForce: 500
   FiringRate: 0.3
 --- !u!54 &676360700
@@ -1047,7 +1047,7 @@ MonoBehaviour:
   m_PlayerPrefab: {fileID: 1685283556975016, guid: 5873a6919d6f63b488eb84fffdf32679,
     type: 2}
   m_AutoCreatePlayer: 1
-  m_PlayerSpawnMethod: 1
+  m_PlayerSpawnMethod: 0
   m_OfflineScene: 
   m_OnlineScene: 
   m_SpawnPrefabs:
@@ -1155,7 +1155,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 111f4ad48654cd14da2abf81783c797d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RotationRate: 4
+  RotationRate: 0
 --- !u!54 &912281966
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1252,7 +1252,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AddForce: 0
   AddTorque: 1
-  Shot: {fileID: 1371502934080192, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
+  Shot: {fileID: 0}
   ShotForce: 500
   FiringRate: 0.3
 --- !u!1 &1080788534
@@ -1287,8 +1287,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AddForce: 0
-  AddTorque: 0
-  Shot: {fileID: 1371502934080192, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
+  AddTorque: 1
+  Shot: {fileID: 0}
   ShotForce: 500
   FiringRate: 0.3
 --- !u!54 &1080788536
@@ -1506,10 +1506,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AddForce: 0
-  AddTorque: 0
+  AddTorque: 1
   Shot: {fileID: 0}
-  ShotForce: 0
-  FiringRate: 0
+  ShotForce: 500
+  FiringRate: 0.3
 --- !u!54 &1589235648
 Rigidbody:
   m_ObjectHideFlags: 0

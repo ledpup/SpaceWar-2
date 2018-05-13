@@ -357,12 +357,12 @@ MonoBehaviour:
   m_TransformSyncMode: 3
   m_SendInterval: 0.033333335
   m_SyncRotationAxis: 2
-  m_RotationSyncCompression: 0
+  m_RotationSyncCompression: 1
   m_SyncSpin: 0
   m_MovementTheshold: 0.001
   m_VelocityThreshold: 0.0001
   m_SnapThreshold: 5
-  m_InterpolateRotation: 15
+  m_InterpolateRotation: 10
   m_InterpolateMovement: 1
 --- !u!136 &136134884579372124
 CapsuleCollider:
