@@ -46,7 +46,7 @@ public class Shot : NetworkBehaviour
                 var thisRigidbody = contact.thisCollider.attachedRigidbody;
                 var otherRigidbody = contact.otherCollider.attachedRigidbody;
 
-                var damage = (thisRigidbody.velocity - otherRigidbody.velocity).magnitude / 2f;
+                var damage = (thisRigidbody.velocity - otherRigidbody.velocity).magnitude / 4f;
                 armouredObject.TakeDamage(damage, thisRigidbody.velocity / Time.fixedDeltaTime, parent != null, collision.contacts[0].otherCollider.gameObject.name);
             }
         }

@@ -181,6 +181,13 @@ public class Ship : NetworkBehaviour, ITargeting
             _fuel -= (forceApplied * .001f) + 0.001f;
         }
 
+        var armouredObject = GetComponent<ArmouredObject>();
+        if (armouredObject.QueuedPhysics != Vector3.zero)
+        {
+            _rigidbody.AddForce(armouredObject.QueuedPhysics);
+        }
+        armouredObject.QueuedPhysics = Vector3.zero;
+
         if (_playerHud != null)
         {
             _playerHud.SpeedText.text = "Speed " + Math.Round(_rigidbody.velocity.magnitude * 10, 0);

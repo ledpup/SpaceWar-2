@@ -15,6 +15,7 @@ namespace Assets
         public Text ArmourText;
 
         [SyncVar] float _armour;
+        [SyncVar] public Vector3 QueuedPhysics = Vector3.zero;
         private PlayerHud _playerHud;
 
         void Start()
@@ -23,6 +24,7 @@ namespace Assets
             _playerHud = gameObject.GetComponent<PlayerHud>();
 
             RpcUpdateHud(Vector3.zero);
+            
         }
 
         public void TakeDamage(float amount, Vector3 vector, bool componentDamaged, string componentName)
@@ -38,14 +40,15 @@ namespace Assets
                 if (destroyed)
                 {
                     componentTransform.parent = null;
-                    NetworkServer.Destroy(componentTransform.gameObject);
+                    //NetworkServer.Destroy(componentTransform.gameObject);
 
-                    //RpcDestroySubcomponent(GetComponent<NetworkIdentity>().netId, componentName);
+                    RpcDestroySubcomponent(GetComponent<NetworkIdentity>().netId, componentName);
                 }
             }
             else
             {
                 _armour -= amount;
+                
                 RpcUpdateHud(vector);
             }
             
@@ -77,11 +80,9 @@ namespace Assets
         [ClientRpc]
         private void RpcUpdateHud(Vector3 vector)
         {
-            var rigidbody = transform.GetComponent<Rigidbody>();
-
-            rigidbody.AddForce(vector);
             if (isLocalPlayer)
             {
+                QueuedPhysics = vector;
                 if (_playerHud != null)
                     _playerHud.ArmourText.text = "Armour " + Mathf.RoundToInt(_armour * 10).ToString();
 
