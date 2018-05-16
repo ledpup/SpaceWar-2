@@ -39,10 +39,8 @@ namespace Assets
                 var destroyed = component.TakeDamage(amount);
                 if (destroyed)
                 {
-                    componentTransform.parent = null;
-                    //NetworkServer.Destroy(componentTransform.gameObject);
-
-                    RpcDestroySubcomponent(GetComponent<NetworkIdentity>().netId, componentName);
+                    RpcDestroyComponent(GetComponent<NetworkIdentity>().netId, componentName);
+                    Destroy(componentTransform.gameObject);
                 }
             }
             else
@@ -68,13 +66,20 @@ namespace Assets
         }
 
         [ClientRpc]
-        private void RpcDestroySubcomponent(NetworkInstanceId networkInstanceId, string component)
+        private void RpcDestroyComponent(NetworkInstanceId networkInstanceId, string component)
         {
             var localObject = ClientScene.FindLocalObject(networkInstanceId);
             var componentTransform = localObject.transform.Find(component);
             if (componentTransform != null)
+            {
                 Destroy(componentTransform.gameObject);
+            }
+        }
 
+        [Command]
+        public void CmdDestroy(GameObject button)
+        {
+            NetworkServer.Destroy(button);
         }
 
         [ClientRpc]

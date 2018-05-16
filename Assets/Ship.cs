@@ -182,12 +182,12 @@ public class Ship : NetworkBehaviour, ITargeting
         }
 
         var armouredObject = GetComponent<ArmouredObject>();
-        if (armouredObject.QueuedPhysics != Vector3.zero)
+        if (armouredObject != null && armouredObject.QueuedPhysics != Vector3.zero)
         {
             _rigidbody.AddForce(armouredObject.QueuedPhysics);
+            armouredObject.QueuedPhysics = Vector3.zero;
         }
-        armouredObject.QueuedPhysics = Vector3.zero;
-
+        
         if (_playerHud != null)
         {
             _playerHud.SpeedText.text = "Speed " + Math.Round(_rigidbody.velocity.magnitude * 10, 0);
