@@ -10,12 +10,12 @@ public class PlayerHud : MonoBehaviour {
     public Text ArmourText;
     public Text FuelText;
 
-    void Start () {
+    void Start ()
+    {
         var controllerName = name.Replace("(Clone)", "");
 
         if (controllerName.StartsWith("Player"))
         {
-
             Vector2 anchorMin = Vector2.zero, anchorMax = Vector2.zero;
             int x = 0;
             if (controllerName == "Player1")

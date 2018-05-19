@@ -13,9 +13,6 @@ public class Ship : NetworkBehaviour, ITargeting
     public GameObject Target { get; set; }
     Rigidbody _targetRigidBody;
 
-    public bool AddForce;
-    public bool AddTorque = true;
-
     public float Armour { get; set; }
     Rigidbody _rigidbody;
 
@@ -32,7 +29,6 @@ public class Ship : NetworkBehaviour, ITargeting
     public float ShotForce = 500f;
     public float FiringRate = .3f;
     float _nextFire;
-    bool _manualFireButtonValid;
     PlayerHud _playerHud;
     void Start ()
     {
@@ -54,26 +50,9 @@ public class Ship : NetworkBehaviour, ITargeting
 
         _playerHud = gameObject.GetComponent<PlayerHud>();
 
-        if (!name.StartsWith("Player"))
-        {
-            AcquireTarget();
-        }
-
         _cannon = gameObject.GetComponentInChildren<Cannon>();
 
         _lockedRotationUntil = Time.time;
-
-
-        try
-        {
-            Input.GetButton(_controllerName + "Fire1");
-
-            _manualFireButtonValid = true;
-        }
-        catch (Exception ex)
-        {
-            _manualFireButtonValid = false;
-        }
     }
 
     public override void OnStartLocalPlayer()
@@ -83,21 +62,10 @@ public class Ship : NetworkBehaviour, ITargeting
 
     void Update()
     {
-        if (_manualFireButtonValid && Input.GetButton(_controllerName + "Fire1"))
+        if (_controllerName != null && Input.GetButton(_controllerName + "Fire1"))
         {
             CmdFireCannon();
         }
-        //else
-        //{
-        //    if (Target != null)
-        //    {
-        //        var distanceToTarget = Vector3.Distance(Target.transform.position, transform.position);
-        //        if (distanceToTarget < 15)
-        //        {
-        //            CmdFireCannon();
-        //        }
-        //    }
-        //}
     }
 
     [Command]
@@ -138,46 +106,11 @@ public class Ship : NetworkBehaviour, ITargeting
                 turboForce = trigger1 * 10f;
 
             }
-            else if (tag == "Untagged")
-            {
-                _players.RemoveAll(item => item == null);
-                var collector = _players.FirstOrDefault(x => Vector3.Distance(x.transform.position, transform.position) < 5);
-                if (collector != null)
-                {
-                    tag = collector.tag;
-                    GetComponent<Renderer>().material.color = Faction.Colour(tag);
-                    AcquireTarget();
-                }
-            }
-            else if (Target != null)
-            {
-                float projectiveForce = 0;
-                if (_cannon != null)
-                    projectiveForce = _cannon.ShotForce;
-
-                var shotMass = 1f;
-                float speed = (projectiveForce / shotMass) * Time.fixedDeltaTime + _rigidbody.velocity.magnitude;
-                var projectileSpeed = speed;
-
-                var interceptPoint = PredictiveAiming.FirstOrderIntercept(transform.position, Vector3.zero, projectileSpeed, Target.transform.position, _targetRigidBody.velocity);
-                var direction = interceptPoint - transform.position;
-                var rotation = Quaternion.LookRotation(direction);
-                transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 5f * Time.fixedDeltaTime);
-
-                force = 7f;
-            }
-            else
-            {
-                AcquireTarget();
-            }
 
             float forceApplied = 0;
-            if (AddForce)
-            {
-                _rigidbody.AddRelativeForce(Vector3.forward * force);
-                _rigidbody.AddRelativeForce(Vector3.forward * turboForce);
-                forceApplied = force + turboForce;
-            }
+            _rigidbody.AddRelativeForce(Vector3.forward * force);
+            _rigidbody.AddRelativeForce(Vector3.forward * turboForce);
+            forceApplied = force + turboForce;
             _fuel -= (forceApplied * .001f) + 0.001f;
         }
 
@@ -210,12 +143,5 @@ public class Ship : NetworkBehaviour, ITargeting
     public static float RadianToDegree(float angle)
     {
         return (float)(angle * (180.0 / Math.PI));
-    }
-
-    private void AcquireTarget()
-    {
-        Target = Targeting.AquireTaget(tag, transform.position, _factions);
-        if (Target != null)
-            _targetRigidBody = Target.GetComponent<Rigidbody>();
     }
 }

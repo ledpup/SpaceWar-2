@@ -21,19 +21,12 @@ public class Missile : NetworkBehaviour
     GameObject _target;
     float _created;
 
-    GameObject _targetPoint;
-
-    void Start () {
+    void Start ()
+    {
         _rigidbody = GetComponent<Rigidbody>();
         _created = Time.time;
 
         RotationRate = .95f;
-
-        if (_missleType == MissleType.Smart)
-        {
-            _targetPoint = Instantiate(TargetPoint, transform.position, transform.rotation) as GameObject;
-            _targetPoint.GetComponent<Renderer>().material.color = Color.red;
-        }
     }
 
     void FixedUpdate()
@@ -48,10 +41,6 @@ public class Missile : NetworkBehaviour
 
         switch (_missleType)
         {
-            case MissleType.Guided:
-                var horizontal = Input.GetAxis(tag + "Horizontal2");
-                _rigidbody.AddTorque(transform.up * 5f * horizontal);
-                break;
             case MissleType.Homing:
                 {
                     if (_created + .75f < Time.time && _target != null)
@@ -106,8 +95,6 @@ public class Missile : NetworkBehaviour
             if (!contact.otherCollider.gameObject.name.Contains("wall"))
             {
                 Destroy(contact.thisCollider.gameObject);
-                if (_targetPoint != null)
-                    Destroy(_targetPoint);
             }
         }
     }
