@@ -32,6 +32,11 @@ public class Ship : NetworkBehaviour, ITargeting
     PlayerHud _playerHud;
     void Start ()
     {
+        if (name.StartsWith("Ship"))
+        {
+            name = "Player1";
+        }
+
         var ni = transform.GetComponent<NetworkIdentity>();
         if (ni != null && !isLocalPlayer)
         {

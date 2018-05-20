@@ -37,6 +37,8 @@ public class CameraBehaviour : NetworkManager {
         SceneCamera.rotation = Quaternion.Euler(90, 0, 0);
     }
 
+
+
     public override void OnStartHost()
     {
         base.OnStartHost();
@@ -80,7 +82,25 @@ public class CameraBehaviour : NetworkManager {
             transforms.AddRange(localPlayers);
 
             CameraFollowSmooth(SceneCamera, transforms);
+
+
+            if (Input.GetButtonDown("Player2Fire1"))
+            {
+                if (!localPlayers.Any(x => x.name.StartsWith("Player2")))
+                {
+                    ClientScene.AddPlayer(1);
+                }
+            }
         }
+    }
+
+    public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
+    {
+        var playerObj = Instantiate(playerPrefab);
+        if (playerControllerId == 1)
+            playerObj.name = "Player2";
+
+        NetworkServer.AddPlayerForConnection(conn, playerObj, playerControllerId);
     }
 
     void CameraFollowSmooth(Transform cameraTransform, List<Transform> transforms)
