@@ -65,6 +65,8 @@ GameObject:
   - component: {fileID: 23233114149679914}
   - component: {fileID: 33470776592980990}
   - component: {fileID: 136255228857833434}
+  - component: {fileID: 114982988099566668}
+  - component: {fileID: 114537518185336986}
   m_Layer: 0
   m_Name: Cannon
   m_TagString: Untagged
@@ -281,6 +283,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Missile: {fileID: 1210607065665294, guid: 88f51ccd0ea19ec45a020ee431937154, type: 2}
   FiringRate: 0.5
+--- !u!114 &114537518185336986
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1691614933574366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 916539393d309be47a0ea662c656833a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114585677448201562
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -363,6 +376,38 @@ MonoBehaviour:
   m_SnapThreshold: 5
   m_InterpolateRotation: 10
   m_InterpolateMovement: 1
+--- !u!114 &114982988099566668
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1691614933574366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 88
+    i1: 115
+    i2: 166
+    i3: 145
+    i4: 157
+    i5: 111
+    i6: 99
+    i7: 180
+    i8: 136
+    i9: 235
+    i10: 132
+    i11: 255
+    i12: 253
+    i13: 243
+    i14: 38
+    i15: 121
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
 --- !u!136 &136134884579372124
 CapsuleCollider:
   m_ObjectHideFlags: 1

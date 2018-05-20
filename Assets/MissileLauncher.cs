@@ -10,10 +10,10 @@ public class MissileLauncher : NetworkBehaviour, IComponent
     public float FiringRate;
     float _nextFire;
 
-    [SyncVar] float _armour;
+    [SyncVar] float _armour = 1;
 
-    void Start () {
-        _armour = 1;
+    void Start ()
+    {
     }
 
     public bool TakeDamage(float amount)
