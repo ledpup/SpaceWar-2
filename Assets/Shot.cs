@@ -7,12 +7,9 @@ using UnityEngine.Networking;
 public class Shot : NetworkBehaviour
 {
     [SerializeField] float ShotLifeTime = 3f;
-    public float Armour { get; set; }
-
     float _age;
     void Start ()
     {
-        Armour = 1;
     }
 	
 	[ServerCallback]
@@ -38,7 +35,6 @@ public class Shot : NetworkBehaviour
             }
 
             var parent = collision.contacts[0].otherCollider.transform.parent;
-
             var armouredObject = parent == null ? collision.contacts[0].otherCollider.GetComponent<ArmouredObject>() : parent.GetComponent<ArmouredObject>();
 
             if (armouredObject != null)

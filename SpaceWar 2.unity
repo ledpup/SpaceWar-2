@@ -424,7 +424,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 111f4ad48654cd14da2abf81783c797d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RotationRate: 0.95
+  RotationRate: 0.2
   Shot: {fileID: 1371502934080192, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
   ShotForce: 500
   FiringRate: 0.3
@@ -925,7 +925,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 111f4ad48654cd14da2abf81783c797d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RotationRate: 0.95
+  RotationRate: 0.2
   Shot: {fileID: 1371502934080192, guid: d2104278cfd92a547a384df6736bcc95, type: 2}
   ShotForce: 500
   FiringRate: 0.3

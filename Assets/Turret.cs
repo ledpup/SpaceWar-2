@@ -11,7 +11,7 @@ public class Turret : NetworkBehaviour, ITargeting
     public GameObject Target { get; set; }
     Rigidbody _targetRigidBody;
 
-    public float RotationRate = .9f;
+    public float RotationRate = .2f;
     List<string> _factions;
 
     public GameObject Shot;
@@ -22,8 +22,6 @@ public class Turret : NetworkBehaviour, ITargeting
     void Start ()
     {
         _factions = new List<string> { "Faction1", "Faction2", "Faction3" };
-
-
 
         Target = Targeting.AquireTaget(tag, transform.position, _factions);
         if (Target != null)
@@ -55,7 +53,7 @@ public class Turret : NetworkBehaviour, ITargeting
             var interceptPoint = PredictiveAiming.FirstOrderIntercept(transform.position, Vector3.zero, projectileSpeed, Target.transform.position, _targetRigidBody.velocity);
             var direction = interceptPoint - transform.position;
             var rotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, RotationRate * Time.deltaTime);
+            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, RotationRate);
 
             var distanceToTarget = Vector3.Distance(Target.transform.position, transform.position);
 

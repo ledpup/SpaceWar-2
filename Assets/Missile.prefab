@@ -114,9 +114,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f35d65f7da64ba34cb56a5cf17cb12bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TargetPoint: {fileID: 1805090989893920, guid: 152e3c411a206bc4d90b89a25d6237d8,
-    type: 2}
-  RotationRate: 100
+  RotationRate: 0.25
+  MissileLifeTime: 10
 --- !u!114 &114435243994656912
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -178,7 +177,7 @@ CapsuleCollider:
   m_GameObject: {fileID: 1210607065665294}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   m_Radius: 0.32
   m_Height: 2.15
   m_Direction: 1
