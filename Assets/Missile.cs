@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Assets;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.Networking;
 
 public enum MissleType
 {
@@ -11,79 +12,70 @@ public enum MissleType
     Homing,
     Smart,
 }
-public class Missile : MonoBehaviour
+public class Missile : NetworkBehaviour
 {
-    public GameObject TargetPoint;
-    public float RotationRate;
+    public float RotationRate = .25f;
 
     Rigidbody _rigidbody;
     MissleType _missleType;
     GameObject _target;
-    float _created;
+    [SerializeField] float MissileLifeTime = 10f;
+    float _age;
 
-    GameObject _targetPoint;
-    Quaternion _rotationOffset;
-
-    void Start () {
+    void Start ()
+    {
         _rigidbody = GetComponent<Rigidbody>();
-        _created = Time.time;
-
-        RotationRate = .95f;
-
-        // Because I'm using capsules with a 90 degree rotation on x
-        _rotationOffset = Quaternion.Euler(90, 0, 0);
-
-        if (_missleType == MissleType.Smart)
-        {
-            _targetPoint = Instantiate(TargetPoint, transform.position, transform.rotation) as GameObject;
-            _targetPoint.GetComponent<Renderer>().material.color = Color.red;
-        }
     }
 
-    void FixedUpdate()
+
+    [ServerCallback]
+    void Update()
     {
+        _age += Time.deltaTime;
+        if (_age > MissileLifeTime)
+            NetworkServer.Destroy(gameObject);
+
         var collider = GetComponent<CapsuleCollider>();
-        if (_created + .25F < Time.time && !collider.enabled)
+        if (_age > .5f && !collider.enabled)
         {
             collider.enabled = true;
         }
 
-        var projectileSpeed = (5 / ((float)Math.Round(Time.time - _created, 2)) + 50);
+        var projectileSpeed = (5 / ((float)Math.Round(Time.time - _age, 2)) + 50);
 
         switch (_missleType)
         {
-            case MissleType.Guided:
-                var horizontal = Input.GetAxis(tag + "Horizontal2");
-                _rigidbody.AddTorque(transform.forward * 5f * -horizontal);
-                break;
             case MissleType.Homing:
                 {
-                    if (_created + .75f < Time.time && _target != null)
+                    if (_age > .75f && _target != null)
                     {
                         var direction = _target.transform.position - transform.position;
-                        var rotation = Quaternion.LookRotation(direction) * _rotationOffset;
+                        var rotation = Quaternion.LookRotation(direction);
                         transform.rotation = Quaternion.Slerp(transform.rotation, rotation, RotationRate);
                     }
                     break;
                 }
             case MissleType.Smart:
                 {
-                    if (_created + .75f < Time.time && _target != null)
+                    if (_age > .75f && _target != null)
                     {
                         var targetRigidBody = _target.GetComponent<Rigidbody>();
 
-                        var targetAimPoint = Assets.PredictiveAiming.FirstOrderIntercept(transform.position, Vector3.zero, projectileSpeed, _target.transform.position, targetRigidBody.velocity);
-                        _targetPoint.transform.position = targetAimPoint;
+                        var targetAimPoint = PredictiveAiming.FirstOrderIntercept(transform.position, Vector3.zero, projectileSpeed, _target.transform.position, targetRigidBody.velocity);
 
                         var direction = targetAimPoint - transform.position;
-                        var rotation = Quaternion.LookRotation(direction) * _rotationOffset;
+                        var rotation = Quaternion.LookRotation(direction);
                         transform.rotation = Quaternion.Slerp(transform.rotation, rotation, RotationRate);
                     }
                     break;
                 }
         }
+    }
 
-        _rigidbody.AddRelativeForce(Vector3.up * projectileSpeed);
+    private void FixedUpdate()
+    {
+        var projectileSpeed = (5 / ((float)Math.Round(Time.time - _age, 2)) + 50);
+        _rigidbody.AddRelativeForce(Vector3.forward * projectileSpeed);
     }
 
     void SetMissileType(MissleType missleType)
@@ -111,8 +103,23 @@ public class Missile : MonoBehaviour
             if (!contact.otherCollider.gameObject.name.Contains("wall"))
             {
                 Destroy(contact.thisCollider.gameObject);
-                if (_targetPoint != null)
-                    Destroy(_targetPoint);
+            }
+
+            if (!isServer)
+            {
+                return;
+            }
+
+            var parent = collision.contacts[0].otherCollider.transform.parent;
+            var armouredObject = parent == null ? collision.contacts[0].otherCollider.GetComponent<ArmouredObject>() : parent.GetComponent<ArmouredObject>();
+
+            if (armouredObject != null)
+            {
+                var thisRigidbody = contact.thisCollider.attachedRigidbody;
+                var otherRigidbody = contact.otherCollider.attachedRigidbody;
+
+                var damage = (thisRigidbody.velocity - otherRigidbody.velocity).magnitude / 4f;
+                armouredObject.TakeDamage(damage, thisRigidbody.velocity / Time.fixedDeltaTime, parent != null, collision.contacts[0].otherCollider.gameObject.name);
             }
         }
     }

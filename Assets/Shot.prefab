@@ -24,6 +24,8 @@ GameObject:
   - component: {fileID: 135683545997380128}
   - component: {fileID: 54490319951429284}
   - component: {fileID: 114431451130745644}
+  - component: {fileID: 114545324565409102}
+  - component: {fileID: 114488708620093566}
   m_Layer: 0
   m_Name: Shot
   m_TagString: Untagged
@@ -57,6 +59,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 4294967295
   m_Materials:
   - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
@@ -111,6 +114,60 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d764cf88df0f0743acc98a99800219c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShotLifeTime: 3
+--- !u!114 &114488708620093566
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1371502934080192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TransformSyncMode: 3
+  m_SendInterval: 0.033333335
+  m_SyncRotationAxis: 0
+  m_RotationSyncCompression: 0
+  m_SyncSpin: 0
+  m_MovementTheshold: 0.001
+  m_VelocityThreshold: 0.0001
+  m_SnapThreshold: 5
+  m_InterpolateRotation: 1
+  m_InterpolateMovement: 1
+--- !u!114 &114545324565409102
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1371502934080192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 210
+    i1: 16
+    i2: 66
+    i3: 120
+    i4: 207
+    i5: 217
+    i6: 42
+    i7: 84
+    i8: 122
+    i9: 56
+    i10: 77
+    i11: 246
+    i12: 115
+    i13: 107
+    i14: 204
+    i15: 149
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
 --- !u!135 &135683545997380128
 SphereCollider:
   m_ObjectHideFlags: 1
