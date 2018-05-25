@@ -9,6 +9,8 @@ public class PlayerHud : MonoBehaviour {
     public Text NameText;
     public Text ArmourText;
     public Text FuelText;
+    public Text ShotsText;
+    public Text MissilesText;
 
     void Start ()
     {
@@ -39,6 +41,8 @@ public class PlayerHud : MonoBehaviour {
             SpeedText = CreateTextElement(canvas, controllerName, "Speed", x, -40, anchorMin, anchorMax);
             ArmourText = CreateTextElement(canvas, controllerName, "Armour", x, -60, anchorMin, anchorMax);
             FuelText = CreateTextElement(canvas, controllerName, "Fuel", x, -80, anchorMin, anchorMax);
+            ShotsText = CreateTextElement(canvas, controllerName, "Shots", x, -100, anchorMin, anchorMax);
+            MissilesText = CreateTextElement(canvas, controllerName, "Missiles", x, -120, anchorMin, anchorMax);
         }
     }
 

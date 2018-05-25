@@ -7,13 +7,17 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+public enum AmmoType
+{
+    Cannon,
+    Missile,
+}
+
 public class Ship : NetworkBehaviour, ITargeting
 {
 
     public GameObject Target { get; set; }
     Rigidbody _targetRigidBody;
-
-    public float Armour { get; set; }
     Rigidbody _rigidbody;
 
 
@@ -33,6 +37,7 @@ public class Ship : NetworkBehaviour, ITargeting
     public float MissileFiringRate = .8f;
     float _nextCannonFire, _nextMissileFire;
     PlayerHud _playerHud;
+    Dictionary<AmmoType, int> _ammo;
     void Start ()
     {
         if (name.StartsWith("Ship"))
@@ -49,7 +54,6 @@ public class Ship : NetworkBehaviour, ITargeting
         _controllerName = name.Replace("(Clone)", "");
 
         _rigidbody = GetComponent<Rigidbody>();
-        Armour = 10;
         _fuel = 100;
 
         _factions = new List<string> { "Faction1", "Faction2", "Faction3" };
@@ -61,73 +65,79 @@ public class Ship : NetworkBehaviour, ITargeting
         _cannon = gameObject.GetComponentInChildren<Cannon>();
 
         _lockedRotationUntil = Time.time;
+
+        _ammo = new Dictionary<AmmoType, int> { { AmmoType.Cannon, 50 }, { AmmoType.Missile, 10 } };
+
     }
 
     public override void OnStartLocalPlayer()
     {
         GetComponent<Renderer>().material.color = Faction.Colour(tag);
+
     }
 
     void Update()
     {
         if (_controllerName != null)
         {
-            if (Input.GetButton(_controllerName + "Fire1"))
+            if (Input.GetButton(_controllerName + "Fire1") && Time.time > _nextCannonFire && _ammo[AmmoType.Cannon] > 0)
             {
+                _nextCannonFire = Time.time + CannonFiringRate;
                 CmdFireCannon();
+                _ammo[AmmoType.Cannon]--;
+                _playerHud.ShotsText.text = "Shots " + _ammo[AmmoType.Cannon].ToString();
             }
             var fire2 = Input.GetButton(_controllerName + "Fire2");
             var fire3 = Input.GetButton(_controllerName + "Fire3");
-            if (fire2 || fire3)
+            if ((fire2 || fire3) && Time.time > _nextMissileFire && _ammo[AmmoType.Missile] > 0)
             {
+                _nextMissileFire = Time.time + MissileFiringRate;
                 CmdFireMissile(fire2);
+                _ammo[AmmoType.Missile]--;
+                _playerHud.MissilesText.text = "Missiles " + _ammo[AmmoType.Missile].ToString();
             }
+        }
+        if (_playerHud != null && string.IsNullOrEmpty(_playerHud.ShotsText.text))
+        {
+            _playerHud.ShotsText.text = "Shots " + _ammo[AmmoType.Cannon].ToString();
+            _playerHud.MissilesText.text = "Missiles " + _ammo[AmmoType.Missile].ToString();
         }
     }
 
     [Command]
     internal void CmdFireMissile(bool smartMissile)
     {
-        if (Time.time > _nextMissileFire)
-        {
-            _nextMissileFire = Time.time + MissileFiringRate;
-            var missileLauncher = gameObject.GetComponentInChildren<MissileLauncher>();
+        var missileLauncher = gameObject.GetComponentInChildren<MissileLauncher>();
 
-            LockRotation(.5f);
+        LockRotation(.5f);
 
-            var missile = Instantiate(Missile, missileLauncher.transform.position, missileLauncher.transform.rotation) as GameObject;
+        var missile = Instantiate(Missile, missileLauncher.transform.position, missileLauncher.transform.rotation) as GameObject;
 
-            missile.tag = _controllerName;
-            missile.SendMessage("SetMissileType", smartMissile ? MissleType.Smart : MissleType.Homing);
-            missile.SendMessage("SetTarget", "Player1");
+        missile.tag = _controllerName;
+        missile.SendMessage("SetMissileType", smartMissile ? MissleType.Smart : MissleType.Homing);
+        missile.SendMessage("SetTarget", "Player1");
 
-            var bulletRigidBody = missile.GetComponent<Rigidbody>();
-            var shipRigidBody = GetComponent<Rigidbody>();
+        var bulletRigidBody = missile.GetComponent<Rigidbody>();
+        var shipRigidBody = GetComponent<Rigidbody>();
 
-            bulletRigidBody.velocity = shipRigidBody.velocity; // Base speed on the ship's velocity
+        bulletRigidBody.velocity = shipRigidBody.velocity; // Base speed on the ship's velocity
 
-            NetworkServer.Spawn(missile);
-        }
+        NetworkServer.Spawn(missile);
     }
 
     [Command]
     internal void CmdFireCannon()
     {
-        if (Time.time > _nextCannonFire)
-        {
-            _nextCannonFire = Time.time + CannonFiringRate;
+        var shot = Instantiate(Shot, _cannon.transform.TransformPoint(Vector3.forward * 1.1f), _cannon.transform.rotation) as GameObject;
 
-            var shot = Instantiate(Shot, _cannon.transform.TransformPoint(Vector3.forward * 1.1f), _cannon.transform.rotation) as GameObject;
+        var shotRigidBody = shot.GetComponent<Rigidbody>();
+        var shipRigidBody = transform.GetComponent<Rigidbody>();
 
-            var shotRigidBody = shot.GetComponent<Rigidbody>();
-            var shipRigidBody = transform.GetComponent<Rigidbody>();
+        shotRigidBody.velocity = shipRigidBody.velocity;
+        shotRigidBody.AddForce(transform.forward * ShotForce);
+        shipRigidBody.AddForce(transform.forward * (-ShotForce * .1f)); // Unrealistic recoil (for fun!)
 
-            shotRigidBody.velocity = shipRigidBody.velocity;
-            shotRigidBody.AddForce(transform.forward * ShotForce);
-            shipRigidBody.AddForce(transform.forward * (-ShotForce * .1f)); // Unrealistic recoil (for fun!)
-
-            NetworkServer.Spawn(shot);
-        }
+        NetworkServer.Spawn(shot);
     }
     void FixedUpdate() {
         if (_fuel > 0)

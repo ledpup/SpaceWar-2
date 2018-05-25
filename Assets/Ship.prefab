@@ -309,6 +309,8 @@ MonoBehaviour:
   NameText: {fileID: 0}
   ArmourText: {fileID: 0}
   FuelText: {fileID: 0}
+  ShotsText: {fileID: 0}
+  MissilesText: {fileID: 0}
 --- !u!114 &114746937116697662
 MonoBehaviour:
   m_ObjectHideFlags: 1
