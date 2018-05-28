@@ -94,6 +94,8 @@ public class CameraBehaviour : NetworkManager {
         }
     }
 
+
+
     public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
     {
         var playerObj = Instantiate(playerPrefab);

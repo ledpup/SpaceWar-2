@@ -62,7 +62,10 @@
     <Compile Include="Assets\ArmouredObject.cs" />
     <Compile Include="Assets\CameraBehaviour.cs" />
     <Compile Include="Assets\Cannon.cs" />
+    <Compile Include="Assets\Crate.cs" />
+    <Compile Include="Assets\CrateSpawner.cs" />
     <Compile Include="Assets\Faction.cs" />
+    <Compile Include="Assets\Hardpoint.cs" />
     <Compile Include="Assets\IComponent.cs" />
     <Compile Include="Assets\ITargeting.cs" />
     <Compile Include="Assets\Missile.cs" />

@@ -37,7 +37,8 @@ public class Ship : NetworkBehaviour, ITargeting
     public float MissileFiringRate = .8f;
     float _nextCannonFire, _nextMissileFire;
     PlayerHud _playerHud;
-    Dictionary<AmmoType, int> _ammo;
+    public Dictionary<AmmoType, int> Ammo;
+    List<Hardpoint> _hardpoints;
     void Start ()
     {
         if (name.StartsWith("Ship"))
@@ -66,7 +67,7 @@ public class Ship : NetworkBehaviour, ITargeting
 
         _lockedRotationUntil = Time.time;
 
-        _ammo = new Dictionary<AmmoType, int> { { AmmoType.Cannon, 50 }, { AmmoType.Missile, 10 } };
+        Ammo = new Dictionary<AmmoType, int> { { AmmoType.Cannon, 50 }, { AmmoType.Missile, 10 } };
 
     }
 
@@ -80,27 +81,27 @@ public class Ship : NetworkBehaviour, ITargeting
     {
         if (_controllerName != null)
         {
-            if (Input.GetButton(_controllerName + "Fire1") && Time.time > _nextCannonFire && _ammo[AmmoType.Cannon] > 0)
+            if (Input.GetButton(_controllerName + "Fire1") && Time.time > _nextCannonFire && Ammo[AmmoType.Cannon] > 0)
             {
                 _nextCannonFire = Time.time + CannonFiringRate;
                 CmdFireCannon();
-                _ammo[AmmoType.Cannon]--;
-                _playerHud.ShotsText.text = "Shots " + _ammo[AmmoType.Cannon].ToString();
+                Ammo[AmmoType.Cannon]--;
+                _playerHud.ShotsText.text = "Shots " + Ammo[AmmoType.Cannon].ToString();
             }
             var fire2 = Input.GetButton(_controllerName + "Fire2");
             var fire3 = Input.GetButton(_controllerName + "Fire3");
-            if ((fire2 || fire3) && Time.time > _nextMissileFire && _ammo[AmmoType.Missile] > 0)
+            if ((fire2 || fire3) && Time.time > _nextMissileFire && Ammo[AmmoType.Missile] > 0)
             {
                 _nextMissileFire = Time.time + MissileFiringRate;
                 CmdFireMissile(fire2);
-                _ammo[AmmoType.Missile]--;
-                _playerHud.MissilesText.text = "Missiles " + _ammo[AmmoType.Missile].ToString();
+                Ammo[AmmoType.Missile]--;
+                _playerHud.MissilesText.text = "Missiles " + Ammo[AmmoType.Missile].ToString();
             }
         }
         if (_playerHud != null && string.IsNullOrEmpty(_playerHud.ShotsText.text))
         {
-            _playerHud.ShotsText.text = "Shots " + _ammo[AmmoType.Cannon].ToString();
-            _playerHud.MissilesText.text = "Missiles " + _ammo[AmmoType.Missile].ToString();
+            _playerHud.ShotsText.text = "Shots " + Ammo[AmmoType.Cannon].ToString();
+            _playerHud.MissilesText.text = "Missiles " + Ammo[AmmoType.Missile].ToString();
         }
     }
 
@@ -109,7 +110,7 @@ public class Ship : NetworkBehaviour, ITargeting
     {
         var missileLauncher = gameObject.GetComponentInChildren<MissileLauncher>();
 
-        LockRotation(.5f);
+        LockRotation(1f);
 
         var missile = Instantiate(Missile, missileLauncher.transform.position, missileLauncher.transform.rotation) as GameObject;
 
@@ -139,25 +140,24 @@ public class Ship : NetworkBehaviour, ITargeting
 
         NetworkServer.Spawn(shot);
     }
-    void FixedUpdate() {
+    void FixedUpdate()
+    {    
+        float force = 0, turboForce = 0;
+        if (_controllerName != null && _controllerName.StartsWith("Player"))
+        {
+            var horizontal = Input.GetAxis(_controllerName + "Horizontal");
+            if (_lockedRotationUntil < Time.time)
+                _rigidbody.AddTorque(transform.up * 5f * horizontal);
+
+            var vertical = Input.GetAxis(_controllerName + "Vertical");
+            force = (vertical > 0 ? vertical : vertical * .8f) * 15f;
+
+            var trigger1 = Input.GetAxis(_controllerName + "Trigger2");
+            turboForce = trigger1 * 10f;
+        }
+
         if (_fuel > 0)
         {
-            float force = 0, turboForce = 0;
-            if (_controllerName.StartsWith("Player"))
-            {
-                var controllerName = name.Replace("(Clone)", "");
-                var horizontal = Input.GetAxis(controllerName + "Horizontal");
-                if (_lockedRotationUntil < Time.time)
-                    _rigidbody.AddTorque(transform.up * 5f * horizontal);
-
-                var vertical = Input.GetAxis(controllerName + "Vertical");
-                force = (vertical > 0 ? vertical : vertical * .8f) * 15f;
-
-                var trigger1 = Input.GetAxis(controllerName + "Trigger2");
-                turboForce = trigger1 * 10f;
-
-            }
-
             float forceApplied = 0;
             _rigidbody.AddRelativeForce(Vector3.forward * force);
             _rigidbody.AddRelativeForce(Vector3.forward * turboForce);
