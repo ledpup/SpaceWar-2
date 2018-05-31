@@ -354,7 +354,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 435e0b0fa61f1dd4da554d1504d4482b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Armour: 10
+  Armour: 100
   ArmourText: {fileID: 0}
   QueuedPhysics: {x: 0, y: 0, z: 0}
 --- !u!114 &114878103132752294

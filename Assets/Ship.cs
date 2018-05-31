@@ -37,7 +37,7 @@ public class Ship : NetworkBehaviour, ITargeting
     public float MissileFiringRate = .8f;
     float _nextCannonFire, _nextMissileFire;
     PlayerHud _playerHud;
-    public Dictionary<AmmoType, int> Ammo;
+    Dictionary<AmmoType, int> _ammo;
     List<Hardpoint> _hardpoints;
     void Start ()
     {
@@ -45,6 +45,7 @@ public class Ship : NetworkBehaviour, ITargeting
         {
             name = "Player1";
         }
+        
 
         var ni = transform.GetComponent<NetworkIdentity>();
         if (ni != null && !isLocalPlayer)
@@ -52,7 +53,7 @@ public class Ship : NetworkBehaviour, ITargeting
             return;
         }
 
-        _controllerName = name.Replace("(Clone)", "");
+        _controllerName = name;
 
         _rigidbody = GetComponent<Rigidbody>();
         _fuel = 100;
@@ -67,7 +68,7 @@ public class Ship : NetworkBehaviour, ITargeting
 
         _lockedRotationUntil = Time.time;
 
-        Ammo = new Dictionary<AmmoType, int> { { AmmoType.Cannon, 50 }, { AmmoType.Missile, 10 } };
+        _ammo = new Dictionary<AmmoType, int> { { AmmoType.Cannon, 50 }, { AmmoType.Missile, 10 } };
 
     }
 
@@ -81,28 +82,33 @@ public class Ship : NetworkBehaviour, ITargeting
     {
         if (_controllerName != null)
         {
-            if (Input.GetButton(_controllerName + "Fire1") && Time.time > _nextCannonFire && Ammo[AmmoType.Cannon] > 0)
+            if (_cannon != null && Input.GetButton(_controllerName + "Fire1") && Time.time > _nextCannonFire && _ammo[AmmoType.Cannon] > 0)
             {
                 _nextCannonFire = Time.time + CannonFiringRate;
                 CmdFireCannon();
-                Ammo[AmmoType.Cannon]--;
-                _playerHud.ShotsText.text = "Shots " + Ammo[AmmoType.Cannon].ToString();
+                ChangeShots(-1);
             }
             var fire2 = Input.GetButton(_controllerName + "Fire2");
             var fire3 = Input.GetButton(_controllerName + "Fire3");
-            if ((fire2 || fire3) && Time.time > _nextMissileFire && Ammo[AmmoType.Missile] > 0)
+            if ((fire2 || fire3) && Time.time > _nextMissileFire && _ammo[AmmoType.Missile] > 0)
             {
                 _nextMissileFire = Time.time + MissileFiringRate;
                 CmdFireMissile(fire2);
-                Ammo[AmmoType.Missile]--;
-                _playerHud.MissilesText.text = "Missiles " + Ammo[AmmoType.Missile].ToString();
+                _ammo[AmmoType.Missile]--;
+                _playerHud.MissilesText.text = "Missiles " + _ammo[AmmoType.Missile].ToString();
             }
         }
         if (_playerHud != null && string.IsNullOrEmpty(_playerHud.ShotsText.text))
         {
-            _playerHud.ShotsText.text = "Shots " + Ammo[AmmoType.Cannon].ToString();
-            _playerHud.MissilesText.text = "Missiles " + Ammo[AmmoType.Missile].ToString();
+            _playerHud.ShotsText.text = "Shots " + _ammo[AmmoType.Cannon].ToString();
+            _playerHud.MissilesText.text = "Missiles " + _ammo[AmmoType.Missile].ToString();
         }
+    }
+
+    private void ChangeShots(int change)
+    {
+        _ammo[AmmoType.Cannon] += change;
+        _playerHud.ShotsText.text = "Shots " + _ammo[AmmoType.Cannon].ToString();
     }
 
     [Command]
@@ -178,6 +184,33 @@ public class Ship : NetworkBehaviour, ITargeting
             _playerHud.FuelText.text = "Fuel " + Math.Round(_fuel, 0);
             if (_fuel < 20f)
                 _playerHud.FuelText.color = Color.red;
+        }
+    }
+
+    [ClientRpc]
+    internal void RpcCollectCrate(Crate.CrateType crateType, int quantity)
+    {
+        if (isLocalPlayer)
+        {
+            switch (crateType)
+            {
+                case Crate.CrateType.Armour:
+                    var armouredObject = GetComponent<ArmouredObject>();
+                    armouredObject.Armour += quantity;
+                    _playerHud.ArmourText.text = "Armour " + Mathf.RoundToInt(armouredObject.Armour).ToString();
+                    break;
+                case Crate.CrateType.Fuel:
+                    _fuel += quantity;
+                    _playerHud.FuelText.text = "Fuel " + Math.Round(_fuel, 0);
+                    break;
+                case Crate.CrateType.Missile:
+                    _ammo[AmmoType.Missile] += quantity;
+                    _playerHud.MissilesText.text = "Missiles " + _ammo[AmmoType.Missile].ToString();
+                    break;
+                case Crate.CrateType.Shot:
+                    ChangeShots(quantity);
+                    break;
+            }
         }
     }
 

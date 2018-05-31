@@ -10,17 +10,15 @@ namespace Assets
 {
     public class ArmouredObject : NetworkBehaviour
     {
-        public float Armour = 1;
+        [SyncVar] public float Armour = 10;
 
         public Text ArmourText;
 
-        [SyncVar] float _armour;
         [SyncVar] public Vector3 QueuedPhysics = Vector3.zero;
         private PlayerHud _playerHud;
 
         void Start()
         {
-            _armour = Armour;
             _playerHud = gameObject.GetComponent<PlayerHud>();
 
             RpcUpdateHud(Vector3.zero);
@@ -29,7 +27,7 @@ namespace Assets
 
         public void TakeDamage(float amount, Vector3 vector, bool componentDamaged, string componentName)
         {
-            if (!isServer || _armour <= 0)
+            if (!isServer || Armour <= 0)
                 return;
 
             if (componentDamaged)
@@ -45,17 +43,16 @@ namespace Assets
             }
             else
             {
-                _armour -= amount;
+                Armour -= amount * 10;
                 
                 RpcUpdateHud(vector);
             }
             
 
-            if (_armour <= 0)
+            if (Armour <= 0)
             {
                 RpcDied();
-                _armour = 0;
-                //Invoke("BackToLobby", 3f);    
+                Armour = 0;
             }
         }
 
@@ -89,8 +86,7 @@ namespace Assets
             {
                 QueuedPhysics = vector;
                 if (_playerHud != null)
-                    _playerHud.ArmourText.text = "Armour " + Mathf.RoundToInt(_armour * 10).ToString();
-
+                    _playerHud.ArmourText.text = "Armour " + Mathf.RoundToInt(Armour).ToString();
             }
         }
     }

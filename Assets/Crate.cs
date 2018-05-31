@@ -10,11 +10,13 @@ public class Crate : NetworkBehaviour
 {
 	public enum CrateType
     {
+        Armour,
         Fuel,
-        Shot,
         Missile,
-        Cannon,
-        MissileLauncher,
+        Shot,
+        
+        Cannon, // Qualatative
+        MissileLauncher, // Qualatative
     }
 
     CrateType _crateType;
@@ -23,8 +25,8 @@ public class Crate : NetworkBehaviour
     void Start ()
     {
         var random = new System.Random();
-        _crateType = (CrateType)random.Next(Enum.GetValues(typeof(CrateType)).Cast<int>().Max());
-        _quantity = (int)_crateType < 4 ? random.Next(0, 10) * 10 : 0;
+        _crateType = (CrateType)random.Next(Enum.GetValues(typeof(CrateType)).Cast<int>().Max() - 2);
+        _quantity = (int)_crateType < 5 ? random.Next(10, 30) : 0;
     }
 
     void OnCollisionEnter(Collision collision)
@@ -33,20 +35,16 @@ public class Crate : NetworkBehaviour
         {
             var collectingShip = contact.otherCollider.GetComponent<Ship>();
 
+            if (collectingShip == null && contact.otherCollider.transform.parent != null)
+            {
+                collectingShip = contact.otherCollider.transform.parent.GetComponent<Ship>();
+            }
             if (collectingShip != null)
             {
-                CmdCollectCrate(contact.otherCollider.gameObject);
+                var networkdIdentity = collectingShip.GetComponent<NetworkIdentity>();
+                collectingShip.RpcCollectCrate(_crateType, _quantity);
                 Destroy(contact.thisCollider.gameObject);
             }
-        }
-    }
-
-    [Command]
-    internal void CmdCollectCrate(GameObject collectingShip)
-    {
-        //if (isLocalPlayer)
-        {
-            collectingShip.GetComponent<Ship>().Ammo[AmmoType.Cannon] += 10;
         }
     }
 }
