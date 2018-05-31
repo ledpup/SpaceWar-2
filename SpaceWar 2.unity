@@ -293,6 +293,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 15
       objectReference: {fileID: 0}
+    - target: {fileID: 114999782709677684, guid: 29322a41aa6903c4b843f12a78f10f65,
+        type: 2}
+      propertyPath: m_ServerOnly
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 29322a41aa6903c4b843f12a78f10f65, type: 2}
   m_IsPrefabParent: 0
@@ -1097,7 +1102,7 @@ MonoBehaviour:
     i13: 0
     i14: 0
     i15: 0
-  m_ServerOnly: 1
+  m_ServerOnly: 0
   m_LocalPlayerAuthority: 0
 --- !u!4 &1115301885
 Transform:
