@@ -11,6 +11,7 @@ public class CameraBehaviour : NetworkManager {
 
     [Header("Scene Camera Properties")]
     [SerializeField] Transform SceneCamera;
+    public Camera FirstSplitCamera;
     [SerializeField] float CameraRotationRadius = 50f;
     [SerializeField] float CameraRotationSpeed = 3f;
     bool _canRotate = true;
@@ -26,6 +27,7 @@ public class CameraBehaviour : NetworkManager {
         //maxX = mapX / 2.0 - horzExtent;
         //minY = vertExtent - mapY / 2.0;
         //maxY = mapY / 2.0 - vertExtent;
+        FirstSplitCamera.enabled = false;
     }
 
     public override void OnStartClient(NetworkClient client)
@@ -75,14 +77,11 @@ public class CameraBehaviour : NetworkManager {
         }
         else
         {
-            var transforms = new List<Transform>();
-
             var nis = FindObjectsOfType<NetworkIdentity>().ToList();
             var localPlayers = nis.Where(x => x.isLocalPlayer).Select(x => x.transform).ToList();
-            transforms.AddRange(localPlayers);
+            var positions = localPlayers.Select(x => x.position).ToList();
 
-            CameraFollowSmooth(SceneCamera, transforms);
-
+            CameraFollowSmooth(SceneCamera, positions);
 
             if (Input.GetButtonDown("Player2Fire1"))
             {
@@ -105,35 +104,35 @@ public class CameraBehaviour : NetworkManager {
         NetworkServer.AddPlayerForConnection(conn, playerObj, playerControllerId);
     }
 
-    void CameraFollowSmooth(Transform cameraTransform, List<Transform> transforms)
+    void CameraFollowSmooth(Transform cameraTransform, List<Vector3> positionsToTrack)
     {
         var zoomFactor = 1.25f;
         var followTimeDelta = 0.01f;
 
         Vector3 cameraDestination;
         float distance = 0;
-        if (transforms.Count > 1)
+        if (positionsToTrack.Count > 1)
         {
             var transformSum = Vector3.zero;
             var distances = new List<float>();
             Vector3 previousObjectPostion = Vector3.zero;
-            foreach (var transform in transforms)
+            foreach (var position in positionsToTrack)
             {
-                transformSum += transform.position;
+                transformSum += position;
                 if (previousObjectPostion != Vector3.zero)
-                    distances.Add(Vector3.Distance(transform.position, previousObjectPostion));
-                previousObjectPostion = transform.position;
+                    distances.Add(Vector3.Distance(position, previousObjectPostion));
+                previousObjectPostion = position;
             }
 
-            var midpoint = transformSum / transforms.Count;
+            var midpoint = transformSum / positionsToTrack.Count;
 
             distance = distances.Max();
 
             cameraDestination = midpoint - cameraTransform.forward * distance * zoomFactor;
         }
-        else if (transforms.Count == 1)
+        else if (positionsToTrack.Count == 1)
         {
-            cameraDestination = transforms[0].position;
+            cameraDestination = positionsToTrack[0];
         }
         else
         {
@@ -142,8 +141,19 @@ public class CameraBehaviour : NetworkManager {
 
         // Lock the maximum zoom
         if (cameraDestination.y < 50f)
+        {
+            FirstSplitCamera.enabled = false;
+            Camera.main.rect = new Rect(0, 0, 1, 1);
             cameraDestination.y = 50f;
-
+        }
+        else if (cameraDestination.y > 100f)
+        {
+            FirstSplitCamera.enabled = true;
+            Camera.main.rect = new Rect(0, 0, 0.5f, 1);
+            Camera.main.transform.position = new Vector3(positionsToTrack[0].x, 50, positionsToTrack[0].z);
+            FirstSplitCamera.transform.position = new Vector3(positionsToTrack[1].x, 50, positionsToTrack[1].z);
+            //cameraDestination.y = 50f;
+        }
 
         cameraTransform.position = Vector3.Slerp(cameraTransform.position, cameraDestination, followTimeDelta);
 

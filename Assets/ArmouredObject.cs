@@ -21,7 +21,7 @@ namespace Assets
         {
             _playerHud = gameObject.GetComponent<PlayerHud>();
 
-            RpcUpdateHud(Vector3.zero);
+            UpdateHud(Vector3.zero);
             
         }
 
@@ -84,10 +84,15 @@ namespace Assets
         {
             if (isLocalPlayer)
             {
-                QueuedPhysics = vector;
-                if (_playerHud != null)
-                    _playerHud.ArmourText.text = "Armour " + Mathf.RoundToInt(Armour).ToString();
+                UpdateHud(vector);
             }
+        }
+
+        private void UpdateHud(Vector3 vector)
+        {
+            QueuedPhysics = vector;
+            if (_playerHud != null)
+                _playerHud.ArmourText.text = "Armour " + Mathf.RoundToInt(Armour).ToString();
         }
     }
 }
