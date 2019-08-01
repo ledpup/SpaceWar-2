@@ -3,10 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class Turret : NetworkBehaviour, ITargeting
+public class Turret : MonoBehaviour, ITargeting
 {
     public GameObject Target { get; set; }
     Rigidbody _targetRigidBody;
@@ -59,7 +58,7 @@ public class Turret : NetworkBehaviour, ITargeting
 
             if (distanceToTarget < 15)
             {
-                CmdFireCannon();
+                FireCannon();
             }
         }
         else
@@ -76,8 +75,7 @@ public class Turret : NetworkBehaviour, ITargeting
     }
 
 
-    [Command]
-    internal void CmdFireCannon()
+    internal void FireCannon()
     {
         if (Time.time > _nextFire)
         {
@@ -87,13 +85,11 @@ public class Turret : NetworkBehaviour, ITargeting
 
             var shotRigidBody = shot.GetComponent<Rigidbody>();
 
-            var shipRigidBody = transform.GetComponent<Rigidbody>();
+            var vehicleRigidBody = transform.GetComponent<Rigidbody>();
 
-            shotRigidBody.velocity = shipRigidBody.velocity;
+            shotRigidBody.velocity = vehicleRigidBody.velocity;
             shotRigidBody.AddForce(transform.forward * ShotForce);
-            shipRigidBody.AddForce(transform.forward * (-ShotForce * .1f)); // Unrealistic recoil (for fun!)
-
-            NetworkServer.Spawn(shot);
+            vehicleRigidBody.AddForce(transform.forward * (-ShotForce * .1f)); // Unrealistic recoil (for fun!)
         }
     }
 }

@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
 public enum MissleType
 {
@@ -12,7 +11,7 @@ public enum MissleType
     Homing,
     Smart,
 }
-public class Missile : NetworkBehaviour
+public class Missile : MonoBehaviour
 {
     public float RotationRate = .25f;
 
@@ -28,12 +27,11 @@ public class Missile : NetworkBehaviour
     }
 
 
-    [ServerCallback]
     void Update()
     {
         _age += Time.deltaTime;
         if (_age > MissileLifeTime)
-            NetworkServer.Destroy(gameObject);
+            Destroy(gameObject);
 
         var collider = GetComponent<CapsuleCollider>();
         if (_age > .5f && !collider.enabled)
@@ -103,11 +101,6 @@ public class Missile : NetworkBehaviour
             if (!contact.otherCollider.gameObject.name.Contains("wall"))
             {
                 Destroy(contact.thisCollider.gameObject);
-            }
-
-            if (!isServer)
-            {
-                return;
             }
 
             var parent = collision.contacts[0].otherCollider.transform.parent;

@@ -4,8 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.UI;
 
 public enum AmmoType
 {
@@ -13,7 +11,7 @@ public enum AmmoType
     Missile,
 }
 
-public class Ship : NetworkBehaviour, ITargeting
+public class Vehicle : MonoBehaviour, ITargeting
 {
 
     public GameObject Target { get; set; }
@@ -40,19 +38,7 @@ public class Ship : NetworkBehaviour, ITargeting
     Dictionary<AmmoType, int> _ammo;
     List<Hardpoint> _hardpoints;
     void Start ()
-    {
-        if (name.StartsWith("Ship"))
-        {
-            name = "Player1";
-        }
-        
-
-        var ni = transform.GetComponent<NetworkIdentity>();
-        if (ni != null && !isLocalPlayer)
-        {
-            return;
-        }
-
+    {        
         _controllerName = name;
 
         _rigidbody = GetComponent<Rigidbody>();
@@ -70,12 +56,7 @@ public class Ship : NetworkBehaviour, ITargeting
 
         _ammo = new Dictionary<AmmoType, int> { { AmmoType.Cannon, 50 }, { AmmoType.Missile, 10 } };
 
-    }
-
-    public override void OnStartLocalPlayer()
-    {
         GetComponent<Renderer>().material.color = Faction.Colour(tag);
-
     }
 
     void Update()
@@ -85,7 +66,7 @@ public class Ship : NetworkBehaviour, ITargeting
             if (_cannon != null && Input.GetButton(_controllerName + "Fire1") && Time.time > _nextCannonFire && _ammo[AmmoType.Cannon] > 0)
             {
                 _nextCannonFire = Time.time + CannonFiringRate;
-                CmdFireCannon();
+                FireCannon();
                 ChangeShots(-1);
             }
             var fire2 = Input.GetButton(_controllerName + "Fire2");
@@ -93,7 +74,7 @@ public class Ship : NetworkBehaviour, ITargeting
             if ((fire2 || fire3) && Time.time > _nextMissileFire && _ammo[AmmoType.Missile] > 0)
             {
                 _nextMissileFire = Time.time + MissileFiringRate;
-                CmdFireMissile(fire2);
+                FireMissile(fire2);
                 _ammo[AmmoType.Missile]--;
                 _playerHud.MissilesText.text = "Missiles " + _ammo[AmmoType.Missile].ToString();
             }
@@ -111,8 +92,7 @@ public class Ship : NetworkBehaviour, ITargeting
         _playerHud.ShotsText.text = "Shots " + _ammo[AmmoType.Cannon].ToString();
     }
 
-    [Command]
-    internal void CmdFireMissile(bool smartMissile)
+    internal void FireMissile(bool smartMissile)
     {
         var missileLauncher = gameObject.GetComponentInChildren<MissileLauncher>();
 
@@ -125,27 +105,23 @@ public class Ship : NetworkBehaviour, ITargeting
         missile.SendMessage("SetTarget", "Player1");
 
         var bulletRigidBody = missile.GetComponent<Rigidbody>();
-        var shipRigidBody = GetComponent<Rigidbody>();
+        var vehicleRigidBody = GetComponent<Rigidbody>();
 
-        bulletRigidBody.velocity = shipRigidBody.velocity; // Base speed on the ship's velocity
-
-        NetworkServer.Spawn(missile);
+        bulletRigidBody.velocity = vehicleRigidBody.velocity; // Base speed on the ship's velocity
     }
 
-    [Command]
-    internal void CmdFireCannon()
+    internal void FireCannon()
     {
         var shot = Instantiate(Shot, _cannon.transform.TransformPoint(Vector3.forward * 1.1f), _cannon.transform.rotation) as GameObject;
 
         var shotRigidBody = shot.GetComponent<Rigidbody>();
-        var shipRigidBody = transform.GetComponent<Rigidbody>();
+        var vehicleRigidBody = transform.GetComponent<Rigidbody>();
 
-        shotRigidBody.velocity = shipRigidBody.velocity;
+        shotRigidBody.velocity = vehicleRigidBody.velocity;
         shotRigidBody.AddForce(transform.forward * ShotForce);
-        shipRigidBody.AddForce(transform.forward * (-ShotForce * .1f)); // Unrealistic recoil (for fun!)
-
-        NetworkServer.Spawn(shot);
+        vehicleRigidBody.AddForce(transform.forward * (-ShotForce * .1f)); // Unrealistic recoil (for fun!)
     }
+
     void FixedUpdate()
     {    
         float force = 0, turboForce = 0;
@@ -187,30 +163,26 @@ public class Ship : NetworkBehaviour, ITargeting
         }
     }
 
-    [ClientRpc]
-    internal void RpcCollectCrate(Crate.CrateType crateType, int quantity)
+    internal void CollectCrate(Crate.CrateType crateType, int quantity)
     {
-        if (isLocalPlayer)
+        switch (crateType)
         {
-            switch (crateType)
-            {
-                case Crate.CrateType.Armour:
-                    var armouredObject = GetComponent<ArmouredObject>();
-                    armouredObject.Armour += quantity;
-                    _playerHud.ArmourText.text = "Armour " + Mathf.RoundToInt(armouredObject.Armour).ToString();
-                    break;
-                case Crate.CrateType.Fuel:
-                    _fuel += quantity;
-                    _playerHud.FuelText.text = "Fuel " + Math.Round(_fuel, 0);
-                    break;
-                case Crate.CrateType.Missile:
-                    _ammo[AmmoType.Missile] += quantity;
-                    _playerHud.MissilesText.text = "Missiles " + _ammo[AmmoType.Missile].ToString();
-                    break;
-                case Crate.CrateType.Shot:
-                    ChangeShots(quantity);
-                    break;
-            }
+            case Crate.CrateType.Armour:
+                var armouredObject = GetComponent<ArmouredObject>();
+                armouredObject.Armour += quantity;
+                _playerHud.ArmourText.text = "Armour " + Mathf.RoundToInt(armouredObject.Armour).ToString();
+                break;
+            case Crate.CrateType.Fuel:
+                _fuel += quantity;
+                _playerHud.FuelText.text = "Fuel " + Math.Round(_fuel, 0);
+                break;
+            case Crate.CrateType.Missile:
+                _ammo[AmmoType.Missile] += quantity;
+                _playerHud.MissilesText.text = "Missiles " + _ammo[AmmoType.Missile].ToString();
+                break;
+            case Crate.CrateType.Shot:
+                ChangeShots(quantity);
+                break;
         }
     }
 

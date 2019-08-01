@@ -1,12 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public class MissileLauncher : NetworkBehaviour, IComponent
+public class MissileLauncher : MonoBehaviour, IComponent
 {
 
-    [SyncVar] float _armour = 1;
+    float _armour = 1;
 
     void Start ()
     {

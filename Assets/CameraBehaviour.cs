@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public class CameraBehaviour : NetworkManager {
+
+public class CameraBehaviour : MonoBehaviour {
 
     double mapX, mapY = 100.0f;
     double minX, maxX, minY, maxY;
@@ -15,10 +15,12 @@ public class CameraBehaviour : NetworkManager {
     [SerializeField] float CameraRotationRadius = 50f;
     [SerializeField] float CameraRotationSpeed = 3f;
     bool _canRotate = true;
-
     float _rotation;
 
-	void Start () {
+    public GameObject Vehicle;
+
+	void Start ()
+    {
         //var vertExtent = GetComponent<Camera>().orthographicSize;
         //var horzExtent = vertExtent * Screen.width / Screen.height;
 
@@ -28,38 +30,10 @@ public class CameraBehaviour : NetworkManager {
         //minY = vertExtent - mapY / 2.0;
         //maxY = mapY / 2.0 - vertExtent;
         FirstSplitCamera.enabled = false;
-    }
-
-    public override void OnStartClient(NetworkClient client)
-    {
-        base.OnStartClient(client);
 
         _canRotate = false;
 
         SceneCamera.rotation = Quaternion.Euler(90, 0, 0);
-    }
-
-
-
-    public override void OnStartHost()
-    {
-        base.OnStartHost();
-
-        _canRotate = false;
-    }
-
-    public override void OnStopClient()
-    {
-        base.OnStopClient();
-
-        _canRotate = true;
-    }
-
-    public override void OnStopHost()
-    {
-        base.OnStopHost();
-
-        _canRotate = true;
     }
 
     void Update ()
@@ -77,32 +51,30 @@ public class CameraBehaviour : NetworkManager {
         }
         else
         {
-            var nis = FindObjectsOfType<NetworkIdentity>().ToList();
-            var localPlayers = nis.Where(x => x.isLocalPlayer).Select(x => x.transform).ToList();
-            var positions = localPlayers.Select(x => x.position).ToList();
+            //var localPlayers = nis.Where(x => x.isLocalPlayer).Select(x => x.transform).ToList();
+            //var positions = localPlayers.Select(x => x.position).ToList();
 
-            CameraFollowSmooth(SceneCamera, positions);
+            CameraFollowSmooth(SceneCamera, new List<Vector3> { Vector3.zero });
+
+            var vehicles = GameObject.FindObjectsOfType<Vehicle>();
 
             if (Input.GetButtonDown("Player2Fire1"))
             {
-                if (!localPlayers.Any(x => x.name.StartsWith("Player2")))
+                if (!vehicles.Any(x => x.name.StartsWith("Player2")))
                 {
-                    ClientScene.AddPlayer(1);
+                    var random = new System.Random();
+                    var vehicle = Instantiate(Vehicle, new Vector3(random.Next(-50, 35), 0.5f, random.Next(-20, 20)), Quaternion.identity) as GameObject;
+                    vehicle.name = "Player2";
+                    vehicle.tag = "Faction2";
                 }
+                //if (!localPlayers.Any(x => x.name.StartsWith("Player2")))
+                //{
+                //    ClientScene.AddPlayer(1);
+                //}
             }
         }
     }
 
-
-
-    public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
-    {
-        var playerObj = Instantiate(playerPrefab);
-        if (playerControllerId == 1)
-            playerObj.name = "Player2";
-
-        NetworkServer.AddPlayerForConnection(conn, playerObj, playerControllerId);
-    }
 
     void CameraFollowSmooth(Transform cameraTransform, List<Vector3> positionsToTrack)
     {

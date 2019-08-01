@@ -2,9 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public class Shot : NetworkBehaviour
+public class Shot : MonoBehaviour
 {
     [SerializeField] float ShotLifeTime = 3f;
     float _age;
@@ -12,12 +11,11 @@ public class Shot : NetworkBehaviour
     {
     }
 	
-	[ServerCallback]
 	void Update ()
     {
         _age += Time.deltaTime;
         if (_age > ShotLifeTime)
-            NetworkServer.Destroy(gameObject);
+            Destroy(gameObject);
 	}
 
     void OnCollisionEnter(Collision collision)
@@ -27,11 +25,6 @@ public class Shot : NetworkBehaviour
             if (!contact.otherCollider.gameObject.name.Contains("wall"))
             {
                 Destroy(contact.thisCollider.gameObject);
-            }
-
-            if (!isServer)
-            {
-                return;
             }
 
             var parent = collision.contacts[0].otherCollider.transform.parent;

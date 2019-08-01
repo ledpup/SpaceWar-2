@@ -3,11 +3,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public class Cannon : NetworkBehaviour, IComponent
+public class Cannon : MonoBehaviour, IComponent
 {
-    [SyncVar] float _armour = 3;
+    float _armour = 3;
 
     void Start()
     {

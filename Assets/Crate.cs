@@ -4,9 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public class Crate : NetworkBehaviour
+public class Crate : MonoBehaviour
 {
 	public enum CrateType
     {
@@ -33,16 +32,15 @@ public class Crate : NetworkBehaviour
     {
         foreach (ContactPoint contact in collision.contacts)
         {
-            var collectingShip = contact.otherCollider.GetComponent<Ship>();
+            var collectingVehicle = contact.otherCollider.GetComponent<Vehicle>();
 
-            if (collectingShip == null && contact.otherCollider.transform.parent != null)
+            if (collectingVehicle == null && contact.otherCollider.transform.parent != null)
             {
-                collectingShip = contact.otherCollider.transform.parent.GetComponent<Ship>();
+                collectingVehicle = contact.otherCollider.transform.parent.GetComponent<Vehicle>();
             }
-            if (collectingShip != null)
+            if (collectingVehicle != null)
             {
-                var networkdIdentity = collectingShip.GetComponent<NetworkIdentity>();
-                collectingShip.RpcCollectCrate(_crateType, _quantity);
+                collectingVehicle.CollectCrate(_crateType, _quantity);
                 Destroy(contact.thisCollider.gameObject);
             }
         }
