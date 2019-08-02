@@ -9,6 +9,7 @@ TagManager:
   - Faction3
   - Player1
   - Player2
+  - Player3
   layers:
   - Default
   - TransparentFX

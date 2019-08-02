@@ -72,4 +72,14 @@ public class PlayerHud : MonoBehaviour {
     void Update () {
 		
 	}
+
+    void OnDestroy()
+    {
+        Destroy(NameText);
+        Destroy(SpeedText);
+        Destroy(ArmourText);
+        Destroy(FuelText);
+        Destroy(ShotsText);
+        Destroy(MissilesText);
+    }
 }

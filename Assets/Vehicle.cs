@@ -127,14 +127,15 @@ public class Vehicle : MonoBehaviour, ITargeting
         float force = 0, turboForce = 0;
         if (_controllerName != null && _controllerName.StartsWith("Player"))
         {
-            var horizontal = Input.GetAxis(_controllerName + "Horizontal");
+            var rotate = Input.GetAxis(_controllerName + "Rotate");
             if (_lockedRotationUntil < Time.time)
-                _rigidbody.AddTorque(transform.up * 5f * horizontal);
+                _rigidbody.AddTorque(transform.up * 5f * rotate);
 
-            var vertical = Input.GetAxis(_controllerName + "Vertical");
-            force = (vertical > 0 ? vertical : vertical * .8f) * 15f;
+            var accelerateValue = Input.GetAxis(_controllerName + "Accelerate");
+            var accelerate = accelerateValue > 0 ? 1 : accelerateValue < 0 ? -1 : 0;
+            force = (accelerate > 0 ? accelerate : accelerate * .8f) * 15f;
 
-            var trigger1 = Input.GetAxis(_controllerName + "Trigger2");
+            var trigger1 = Input.GetAxis(_controllerName + "Boost");
             turboForce = trigger1 * 10f;
         }
 

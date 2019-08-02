@@ -58,19 +58,18 @@ public class CameraBehaviour : MonoBehaviour {
 
             var vehicles = GameObject.FindObjectsOfType<Vehicle>();
 
-            if (Input.GetButtonDown("Player2Fire1"))
+            for (var i = 1; i < 4; i++)
             {
-                if (!vehicles.Any(x => x.name.StartsWith("Player2")))
+                if (Input.GetButtonDown($"Player{i}Fire1"))
                 {
-                    var random = new System.Random();
-                    var vehicle = Instantiate(Vehicle, new Vector3(random.Next(-50, 35), 0.5f, random.Next(-20, 20)), Quaternion.identity) as GameObject;
-                    vehicle.name = "Player2";
-                    vehicle.tag = "Faction2";
+                    if (!vehicles.Any(x => x.name.StartsWith($"Player{i}")))
+                    {
+                        var random = new System.Random();
+                        var vehicle = Instantiate(Vehicle, new Vector3(random.Next(-50, 35), 0.5f, random.Next(-20, 20)), Quaternion.identity) as GameObject;
+                        vehicle.name = $"Player{i}";
+                        vehicle.tag = $"Faction{i}";
+                    }
                 }
-                //if (!localPlayers.Any(x => x.name.StartsWith("Player2")))
-                //{
-                //    ClientScene.AddPlayer(1);
-                //}
             }
         }
     }

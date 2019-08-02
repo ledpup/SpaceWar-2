@@ -78,8 +78,14 @@
  <Reference Include="com.unity.multiplayer-hlapi.Editor">
  <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/com.unity.multiplayer-hlapi.Editor.dll</HintPath>
  </Reference>
+ <Reference Include="Unity.VSCode.Editor">
+ <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+ </Reference>
  <Reference Include="Unity.TextMeshPro.Editor">
  <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.UI">
+ <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Timeline">
  <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
@@ -92,6 +98,15 @@
  </Reference>
  <Reference Include="UnityEngine.XR.LegacyInputHelpers">
  <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/UnityEngine.XR.LegacyInputHelpers.dll</HintPath>
+ </Reference>
+ <Reference Include="Unity.Rider.Editor">
+ <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
+ </Reference>
+ <Reference Include="Unity.2D.Sprite.Editor">
+ <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
+ </Reference>
+ <Reference Include="Unity.2D.Tilemap.Editor">
+ <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/Unity.2D.Tilemap.Editor.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.SpatialTracking">
  <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/UnityEditor.SpatialTracking.dll</HintPath>
@@ -108,26 +123,11 @@
  <Reference Include="UnityEditor.XR.LegacyInputHelpers">
  <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/UnityEditor.XR.LegacyInputHelpers.dll</HintPath>
  </Reference>
- <Reference Include="com.unity.multiplayer-hlapi.Runtime">
- <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/com.unity.multiplayer-hlapi.Runtime.dll</HintPath>
- </Reference>
- <Reference Include="Unity.VSCode.Editor">
- <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.UI">
- <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Rider.Editor">
- <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.2D.Sprite.Editor">
- <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.2D.Tilemap.Editor">
- <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/Unity.2D.Tilemap.Editor.dll</HintPath>
- </Reference>
  <Reference Include="UnityEditor.UI">
  <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+ </Reference>
+ <Reference Include="com.unity.multiplayer-hlapi.Runtime">
+ <HintPath>C:/Users/ledpup/Documents/GitHub/SpaceWar-2/Library/ScriptAssemblies/com.unity.multiplayer-hlapi.Runtime.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.AIModule">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.0f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
